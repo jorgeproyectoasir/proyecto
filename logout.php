@@ -1,12 +1,12 @@
 <?php
 session_start();
-require_once 'conexion.php';       // Asegúrate de tener acceso a la BD
-require_once 'includes/log.php';   // Función de logging
+require_once 'conexion.php';
+require_once 'includes/log.php';
 
 $usuario_id = $_SESSION['id'] ?? null;
 
 if ($usuario_id) {
-    registrar_log($conexion, $usuario_id, 'Cierre de sesión');
+    registrar_log($conn, $usuario_id, 'logout', 'El usuario cerró sesión');
 }
 
 session_unset();

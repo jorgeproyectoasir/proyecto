@@ -1,7 +1,6 @@
 <?php
 include 'includes/auth.php';
 include 'includes/header.php';
-
 echo "<h2>Bienvenido, {$_SESSION['nombre']}</h2>";
 echo "<p>Rol: {$_SESSION['rol']}</p>";
 

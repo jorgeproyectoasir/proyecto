@@ -43,7 +43,9 @@ function obtenerRol($conexion, $rol_id) {
 }
 ?>
 
+
 <?php include '../includes/header.php'; ?>
+<link rel="stylesheet" href="../css/estilo.css">
 <h2>Error al iniciar sesión</h2>
 <p class="text-danger"><?php echo $error ?? ''; ?></p>
 <a href="../index.php" class="btn btn-secondary">Volver</a>

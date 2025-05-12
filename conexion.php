@@ -3,7 +3,6 @@ $host = "localhost";
 $usuario = "jorge";
 $contrasena = "Jorge1234!";
 $base_datos = "plataforma_it";
-
 $conexion = new mysqli($host, $usuario, $contrasena, $base_datos);
 
 if ($conexion->connect_error) {
