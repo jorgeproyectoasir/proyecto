@@ -1,0 +1,70 @@
+<?php
+include '../includes/auth.php';
+include '../includes/header.php';
+include '../conexion.php';
+require_once '../includes/log.php';
+
+if ($_SESSION['rol'] !== 'admin') {
+    echo "Acceso denegado.";
+    include '../includes/footer.php';
+    exit();
+}
+
+// Procesar cambio de rol
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $usuario_id = intval($_POST['usuario_id']);
+    $nuevo_rol = intval($_POST['rol_id']);
+    
+    $stmt = $conexion->prepare("UPDATE usuarios SET rol_id = ? WHERE id = ?");
+    $stmt->bind_param("ii", $nuevo_rol, $usuario_id);
+    $stmt->execute();
+    echo "<p class='text-success'>Rol actualizado correctamente.</p>";
+}
+
+// Obtener usuarios
+$usuarios = $conexion->query("SELECT u.id, u.nombre, u.email, r.nombre AS rol 
+                              FROM usuarios u
+                              LEFT JOIN roles r ON u.rol_id = r.id");
+
+// Obtener roles
+$roles = $conexion->query("SELECT * FROM roles");
+$lista_roles = [];
+while ($r = $roles->fetch_assoc()) {
+    $lista_roles[$r['id']] = $r['nombre'];
+}
+
+registrar_log($conexion, $_SESSION['id'], 'Cambió el rol del usuario ID ' . $usuario_id);
+?>
+
+<h2>Asignar roles a usuarios</h2>
+
+<table class="table table-bordered">
+<tr><th>Nombre</th><th>Email</th><th>Rol actual</th><th>Nuevo rol</th><th>Acción</th></tr>
+<?php while ($u = $usuarios->fetch_assoc()): ?>
+<tr>
+    <form method="POST">
+        <td><?= htmlspecialchars($u['nombre']) ?></td>
+        <td><?= htmlspecialchars($u['email']) ?></td>
+        <td><?= htmlspecialchars($u['rol']) ?></td>
+        <td>
+            <select name="rol_id" class="form-select">
+                <?php foreach ($lista_roles as $id => $nombre): ?>
+                    <option value="<?= $id ?>" <?= $u['rol'] === $nombre ? 'selected' : '' ?>>
+                        <?= htmlspecialchars(ucfirst($nombre)) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </td>
+        <td>
+            <input type="hidden" name="usuario_id" value="<?= $u['id'] ?>">
+            <button type="submit" class="btn btn-primary btn-sm">Actualizar</button>
+        </td>
+    </form>
+</tr>
+<?php endwhile; ?>
+</table>
+
+<a href="../panel.php" class="btn btn-secondary mt-3">Volver al panel</a>
+
+<?php include '../includes/footer.php'; ?>
+
