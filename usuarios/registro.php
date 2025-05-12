@@ -29,6 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $mensaje = "Error al registrar usuario.";
         }
+	include_once("../includes/log.php");
 
         $stmt->close();
     }

@@ -1,8 +1,9 @@
 <?php
-function registrar_log($conexion, $usuario_id, $accion) {
-    $stmt = $conexion->prepare("INSERT INTO logs (usuario_id, accion) VALUES (?, ?)");
-    $stmt->bind_param("is", $usuario_id, $accion);
+function registrar_log($conn, $usuario_id, $accion, $descripcion = "") {
+    $stmt = $conn->prepare("INSERT INTO logs (usuario_id, accion, descripcion) VALUES (?, ?, ?)");
+    $stmt->bind_param("iss", $usuario_id, $accion, $descripcion);
     $stmt->execute();
+    $stmt->close();
 }
 ?>
 

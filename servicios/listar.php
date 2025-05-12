@@ -12,6 +12,7 @@ $resultado = $conexion->query("SELECT * FROM servicios");
 <h2>Listado de Servicios</h2>
 
 <a href="agregar.php">➕ Agregar nuevo servicio</a><br><br>
+<a href="eliminar.php?id=<?= $fila['id'] ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar este servicio?');">Eliminar</a>
 
 <table border="1" cellpadding="8">
     <tr>
