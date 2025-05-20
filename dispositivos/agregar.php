@@ -13,7 +13,14 @@ include '../conexion.php';
 // Procesar formulario
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $nombre = $_POST['nombre'];
-    $ip = $_POST['ip'];
+    $ip = trim($_POST['ip']);
+
+    if (!preg_match('/^\d{1,3}(\.\d{1,3}){3}$/', $ip)) {
+       echo "<p class='text-danger'>IP inválida. Debe tener el formato correcto, como 192.168.0.1</p>";
+       include '../includes/footer.php';
+       exit();
+    }
+
     $tipo = $_POST['tipo'];
     $estado = $_POST['estado'];
     $responsable = $_POST['responsable'];
@@ -22,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->bind_param("ssssi", $nombre, $ip, $tipo, $estado, $responsable);
     $stmt->execute();
     
-    registrar_log($conexion, $_SESSION['id'], 'Agregó dispositivo ' . $nombre);
+    registrar_log($conexion, $_SESSION["usuario_id"], 'Agregó dispositivo ' . $nombre);
     echo "<p class='text-success'>Dispositivo registrado correctamente.</p>";
     echo "<a href='listar.php' class='btn btn-primary'>Volver al listado</a>";
 
@@ -43,7 +50,7 @@ $res = $conexion->query("SELECT id, nombre FROM usuarios");
     </div>
     <div class="mb-3">
         <label>IP:</label>
-        <input type="text" name="ip" class="form-control" required>
+        <input type="text" name="ip" id="ip" required pattern="\d{1,3}(\.\d{1,3}){3}" title="Debe tener el formato: 192.168.0.1">
     </div>
     <div class="mb-3">
         <label>Tipo:</label>

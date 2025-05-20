@@ -3,11 +3,12 @@ include '../includes/auth.php';
 include '../includes/header.php';
 require_once '../includes/log.php';
 
-if ($_SESSION['rol'] !== 'admin' && $_SESSION['rol'] !== 'tecnico') {
+if (!in_array($_SESSION['rol'], ['admin', 'tecnico', 'usuario'])) {
     echo "Acceso denegado.";
     include '../includes/footer.php';
     exit();
 }
+
 
 include '../conexion.php';
 
@@ -15,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $descripcion = $_POST['descripcion'];
     $tipo = $_POST['tipo'];
     $dispositivo = $_POST['dispositivo'];
-    $usuario_id = $_SESSION['id']; // usuario logueado
+    $usuario_id = $_SESSION["usuario_id"]; // usuario logueado
 
     $stmt = $conexion->prepare("INSERT INTO incidencias (descripcion, tipo, dispositivo_id, usuario_id) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssii", $descripcion, $tipo, $dispositivo, $usuario_id);
@@ -28,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 $dispositivos = $conexion->query("SELECT id, nombre FROM dispositivos");
-registrar_log($conexion, $_SESSION['id'], 'Reportó incidencia "' . $descripcion . '"');
+registrar_log($conexion, $_SESSION["usuario_id"], 'Reportó incidencia "' . $descripcion . '"');
 ?>
 
 <h2>Crear nueva incidencia</h2>

@@ -3,7 +3,7 @@ include_once("../conexion.php");
 include_once("../includes/auth.php");
 include_once("../includes/log.php");
 
-if (!isset($_SESSION["id"]) || !isset($_GET["id"])) {
+if (!isset($_SESSION["usuario_id"]) || !isset($_GET["id"])) {
     header("Location: listar.php");
     exit;
 }
@@ -32,7 +32,7 @@ if ($resultado->num_rows > 0) {
     $stmt_del->close();
 
     // Registrar log
-    registrar_log($conn, $_SESSION["id"], "eliminar_servicio", "Se eliminó el servicio: $nombre_servicio (ID $servicio_id)");
+    registrar_log($conn, $_SESSION["usuario_id"], "eliminar_servicio", "Se eliminó el servicio: $nombre_servicio (ID $servicio_id)");
 }
 
 $stmt->close();

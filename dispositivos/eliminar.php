@@ -11,7 +11,7 @@ if ($id > 0) {
     $stmt->execute();
 
     // ✅ Aquí SÍ debe ir el log
-    registrar_log($conexion, $_SESSION['id'], 'Eliminó dispositivo ID ' . $id);
+    registrar_log($conexion, $_SESSION["usuario_id"], 'Eliminó dispositivo ID ' . $id);
 }
 
 header("Location: listar.php");

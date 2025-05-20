@@ -5,8 +5,12 @@ include '../conexion.php';
 
 echo "<h2>Listado de Incidencias</h2>";
 
+if (isset($_GET['eliminado']) && $_GET['eliminado'] == 1) {
+    echo "<div class='alert alert-success'>✅ Incidencia eliminada correctamente.</div>";
+}
+
 // Obtener incidencias
-$sql = "SELECT i.*, u.nombre AS usuario, d.nombre AS dispositivo 
+$sql = "SELECT i.*, u.nombre AS usuario, d.nombre AS dispositivo
         FROM incidencias i
         LEFT JOIN usuarios u ON i.usuario_id = u.id
         LEFT JOIN dispositivos d ON i.dispositivo_id = d.id
@@ -41,16 +45,22 @@ while ($row = $resultado->fetch_assoc()) {
         <td>{$row['usuario']}</td>
         <td>";
 
-    // Solo mostrar botón si está abierta
-    if (
-        $row['estado'] === 'abierta' &&
-        ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico')
-    ) {
-        echo "<a href='cerrar.php?id={$row['id']}' class='btn btn-danger btn-sm'>Cerrar</a>";
+    // Botón cerrar si está abierta
+    if ($row['estado'] === 'abierta' && ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico')) {
+        echo "<a href='cerrar.php?id={$row['id']}' class='btn btn-warning btn-sm me-2'>Cerrar</a>";
     }
+
+    // Botón eliminar solo si está cerrada
+    if ($row['estado'] === 'cerrada' && ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico')) {
+        echo "<a href='eliminar.php?id={$row['id']}' class='btn btn-danger btn-sm eliminar me-2'>Eliminar</a>";
+    }
+
+    // Botón comentarios (siempre visible)
+    echo "<a href='comentarios.php?id={$row['id']}' class='btn btn-info btn-sm'>Comentarios</a>";
 
     echo "</td></tr>";
 }
+
 echo "</table>";
 
 // Botón para crear

@@ -1,40 +1,35 @@
-<?php
-include 'includes/auth.php';
-include 'includes/header.php';
-echo "<h2>Bienvenido, {$_SESSION['nombre']}</h2>";
-echo "<p>Rol: {$_SESSION['rol']}</p>";
+<?php session_start(); include 'includes/auth.php'; include 'includes/header.php'; ?>
 
-// Contenido personalizado
-switch ($_SESSION['rol']) {
-    case 'admin':
-        echo "<ul>
-                <li><a href='usuarios/listar.php'>Gestión de usuarios</a></li>
-                <li><a href='usuarios/asignar_roles.php'>Asignar roles</a></li>
-                <li><a href='dispositivos/listar.php'>Gestión de dispositivos</a></li>
-                <li><a href='logs/accesos.php'>Ver logs de acceso</a></li>
-              </ul>";
-        break;
+<div class="panel-container">
+    <h2 class="bienvenida">Bienvenido, <?= htmlspecialchars($_SESSION['nombre']) ?></h2>
+    <p class="rol">Rol: <?= ucfirst($_SESSION['rol']) ?></p>
 
-    case 'tecnico':
-        echo "<ul>
-                <li><a href='dispositivos/listar.php'>Ver dispositivos</a></li>
-                <li><a href='tareas/listar.php'>Ver tareas programadas</a></li>
-                <li><a href='eventos/ver_logs.php'>Ver eventos</a></li>
-              </ul>";
-        break;
+    <div class="panel-grid">
+        <?php $rol = $_SESSION['rol']; ?>
 
-    case 'usuario':
-        echo "<ul>
-                <li><a href='incidencias/crear.php'>Reportar incidencia</a></li>
-                <li><a href='incidencias/listar.php'>Mis incidencias</a></li>
-              </ul>";
-        break;
+        <?php if ($rol === 'admin'): ?>
+            <a href="usuarios/listar.php" class="panel-card">👥 Usuarios</a>
+            <a href="usuarios/asignar_roles.php" class="panel-card">🛡️ Asignar Roles</a>
+            <a href="dispositivos/listar.php" class="panel-card">🖥️ Dispositivos</a>
+            <a href="incidencias/listar.php" class="panel-card">🚨 Incidencias</a>
+            <a href="servicios/listar.php" class="panel-card">🔧 Servicios</a>
+            <a href="tareas/listar.php" class="panel-card">📋 Tareas</a>
+            <a href="logs/accesos.php" class="panel-card">📜 Logs</a>
+        <?php elseif ($rol === 'tecnico'): ?>
+            <a href="dispositivos/listar.php" class="panel-card">🖥️ Dispositivos</a>
+            <a href="tareas/listar.php" class="panel-card">📋 Mis Tareas</a>
+            <a href="incidencias/listar.php" class="panel-card">🚨 Incidencias</a>
+            <a href="servicios/listar.php" class="panel-card">🔧 Servicios</a>
+            <a href="usuarios/listar.php" class="panel-card">👥 Ver Usuarios</a>
+        <?php elseif ($rol === 'usuario'): ?>
+            <a href="incidencias/crear.php" class="panel-card">📝 Reportar Incidencia</a>
+            <a href="incidencias/listar.php" class="panel-card">📋 Mis Incidencias</a>
+        <?php endif; ?>
 
-    default:
-        echo "<p>Rol desconocido</p>";
-}
+        <a href="usuarios/perfil.php" class="panel-card">👤 Mi Perfil</a>
+        <a href="logout.php" class="panel-card logout">🚪 Cerrar sesión</a>
+	<a href="buscar.php" class="panel-card">🔍 Buscar</a>
+    </div>
+</div>
 
-echo "<br><a href='logout.php' class='btn btn-danger'>Cerrar sesión</a>";
-
-include 'includes/footer.php';
-
+<?php include 'includes/footer.php'; ?>

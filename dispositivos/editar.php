@@ -39,7 +39,7 @@ $stmt->execute();
 $dispositivo = $stmt->get_result()->fetch_assoc();
 
 $res = $conexion->query("SELECT id, nombre FROM usuarios");
-registrar_log($conexion, $_SESSION['id'], 'Editó dispositivo ID ' . $id);
+registrar_log($conexion, $_SESSION["usuario_id"], 'Editó dispositivo ID ' . $id);
 ?>
 
 <h2>Editar dispositivo</h2>

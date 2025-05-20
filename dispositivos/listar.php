@@ -22,7 +22,7 @@ if (
 
 // Obtener dispositivos
 $sql = "SELECT dispositivos.id, dispositivos.nombre AS dispositivo_nombre, dispositivos.ip, dispositivos.estado,
-               usuarios.nombre AS responsable
+               usuarios.nombre AS responsable, dispositivos.tipo
         FROM dispositivos
         LEFT JOIN usuarios ON dispositivos.responsable = usuarios.id";
 
@@ -43,7 +43,7 @@ while ($row = $resultado->fetch_assoc()) {
 
     // Solo admin o técnico pueden eliminar
     if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico') {
-        echo "<a href='listar.php?eliminar={$row['id']}' class='btn btn-danger btn-sm'>Eliminar</a>";
+        echo "<a href='listar.php?eliminar={$row['id']}' class='btn btn-danger btn-sm eliminar'>Eliminar</a>";
 	echo "<a href='editar.php?id={$row['id']}' class='btn btn-warning btn-sm me-2'>Editar</a>";
     }
 

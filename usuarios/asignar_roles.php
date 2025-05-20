@@ -18,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt = $conexion->prepare("UPDATE usuarios SET rol_id = ? WHERE id = ?");
     $stmt->bind_param("ii", $nuevo_rol, $usuario_id);
     $stmt->execute();
+    registrar_log($conexion, $_SESSION["usuario_id"], 'Cambió el rol del usuario ID ' . $usuario_id);
     echo "<p class='text-success'>Rol actualizado correctamente.</p>";
 }
 
@@ -33,7 +34,7 @@ while ($r = $roles->fetch_assoc()) {
     $lista_roles[$r['id']] = $r['nombre'];
 }
 
-registrar_log($conexion, $_SESSION['id'], 'Cambió el rol del usuario ID ' . $usuario_id);
+
 ?>
 
 <h2>Asignar roles a usuarios</h2>

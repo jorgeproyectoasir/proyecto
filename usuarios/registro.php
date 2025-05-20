@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h2>Registro de Usuario</h2>
     <?php if ($mensaje != "") echo "<p>$mensaje</p>"; ?>
 
-    <form method="POST" action="">
+    <form method="POST" action="" id="formRegistro">
         <label>Nombre:</label>
         <input type="text" name="nombre" required><br>
 
@@ -57,12 +57,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="email" name="email" required><br>
 
         <label>Contraseña:</label>
-        <input type="password" name="password" required><br>
+<div style="display: flex; align-items: center; gap: 10px;">
+    <input type="password" name="password" id="password" required>
+    <button type="button" id="togglePassword">Mostrar</button>
+</div>
+
 
         <button type="submit">Registrarse</button>
     </form>
 
-    <p><a href="../index.php">Volver al login</a></p>
+    <p><a href="listar.php" class="btn btn-secondary mt-3">Volver</a></p>
+    
+    <script src="../js/app.js" defer></script>
+
 </body>
 </html>
 
