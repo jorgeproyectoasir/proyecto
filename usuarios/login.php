@@ -4,7 +4,6 @@ require_once '../conexion.php';
 require_once '../includes/log.php';
 
 $ip = $_SERVER['REMOTE_ADDR'];
-$error = "";
 
 // Verificar si hay demasiados intentos fallidos
 function estaBloqueado($conexion, $email, $ip) {
@@ -52,7 +51,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = $_POST['password'];
 
     if (estaBloqueado($conexion, $email, $ip)) {
-        $error = "Demasiados intentos fallidos. Inténtalo de nuevo en unos minutos.";
+        $_SESSION['flash'] = ['tipo' => 'error', 'mensaje' => "❌ Demasiados intentos fallidos. Inténtalo más tarde."];
+        header("Location: ../index.php");
+        exit();
     } else {
         $sql = "SELECT * FROM usuarios WHERE email = ?";
         $stmt = $conexion->prepare($sql);
@@ -69,15 +70,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['nombre'] = $usuario['nombre'];
                 $_SESSION['rol'] = obtenerRol($conexion, $usuario['rol_id']);
                 registrar_log($conexion, $usuario['id'], 'Inicio de sesión');
+
                 header("Location: ../panel.php");
                 exit();
             } else {
-                $error = "Contraseña incorrecta.";
+                $_SESSION['flash'] = ['tipo' => 'error', 'mensaje' => "❌ Contraseña incorrecta."];
                 registrarIntento($conexion, $email, $ip);
+                header("Location: ../index.php");
+                exit();
             }
         } else {
-            $error = "Usuario no encontrado.";
+            $_SESSION['flash'] = ['tipo' => 'error', 'mensaje' => "❌ Usuario no encontrado."];
             registrarIntento($conexion, $email, $ip);
+            header("Location: ../index.php");
+            exit();
         }
     }
 }
@@ -91,21 +97,4 @@ function obtenerRol($conexion, $rol_id) {
     return $resultado['nombre'] ?? 'desconocido';
 }
 ?>
-
-<?php include '../includes/header.php'; ?>
-<h2>Iniciar sesión</h2>
-<?php if ($error): ?>
-    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-<?php endif; ?>
-<form method="POST">
-    <label>Email:</label>
-    <input type="email" name="email" required>
-    <br>
-    <label>Contraseña:</label>
-    <input type="password" name="password" required>
-    <br>
-    <button type="submit">Entrar</button>
-</form>
-<a href="../index.php" class="btn btn-secondary mt-3">Volver</a>
-<?php include '../includes/footer.php'; ?>
 

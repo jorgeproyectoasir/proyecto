@@ -4,8 +4,11 @@ include '../includes/header.php';
 include '../conexion.php';
 require_once '../includes/log.php';
 
+session_start();
+
+// Verificación de permisos: solo admins pueden asignar roles
 if ($_SESSION['rol'] !== 'admin') {
-    echo "Acceso denegado.";
+    echo "<p class='alert alert-danger'>❌ Acceso denegado.</p>";
     include '../includes/footer.php';
     exit();
 }
@@ -14,18 +17,33 @@ if ($_SESSION['rol'] !== 'admin') {
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $usuario_id = intval($_POST['usuario_id']);
     $nuevo_rol = intval($_POST['rol_id']);
-    
+
     $stmt = $conexion->prepare("UPDATE usuarios SET rol_id = ? WHERE id = ?");
     $stmt->bind_param("ii", $nuevo_rol, $usuario_id);
-    $stmt->execute();
-    registrar_log($conexion, $_SESSION["usuario_id"], 'Cambió el rol del usuario ID ' . $usuario_id);
-    echo "<p class='text-success'>Rol actualizado correctamente.</p>";
+
+    if ($stmt->execute()) {
+        registrar_log($conexion, $_SESSION["usuario_id"], 'Cambió el rol del usuario ID ' . $usuario_id);
+
+        // Mostrar mensaje y redirigir con retraso de 2 segundos
+        echo "<div class='alert alert-success text-center'>✅ Rol actualizado correctamente. Redirigiendo...</div>";
+        echo "<script>
+                setTimeout(() => { window.location.href = 'asignar_roles.php'; }, 750);
+              </script>";
+        exit();
+    } else {
+        echo "<div class='alert alert-danger text-center'>❌ Error al actualizar el rol.</div>";
+    }
+
+    $stmt->close();
 }
 
 // Obtener usuarios
-$usuarios = $conexion->query("SELECT u.id, u.nombre, u.email, r.nombre AS rol 
+$usuarios = $conexion->query("SELECT u.id, u.nombre, u.email, r.nombre AS rol
                               FROM usuarios u
-                              LEFT JOIN roles r ON u.rol_id = r.id");
+                              LEFT JOIN roles r ON u.rol_id = r.id
+                              ORDER BY u.id DESC
+                              LIMIT 15");
+
 
 // Obtener roles
 $roles = $conexion->query("SELECT * FROM roles");
@@ -33,13 +51,18 @@ $lista_roles = [];
 while ($r = $roles->fetch_assoc()) {
     $lista_roles[$r['id']] = $r['nombre'];
 }
-
-
 ?>
 
 <h2>Asignar roles a usuarios</h2>
+<style>
+  h2 {
+    font-size: 3rem;
+    font-weight: 900;
+  }
+</style>
 
-<table class="table table-bordered">
+
+<table class="table-accesos">
 <tr><th>Nombre</th><th>Email</th><th>Rol actual</th><th>Nuevo rol</th><th>Acción</th></tr>
 <?php while ($u = $usuarios->fetch_assoc()): ?>
 <tr>
@@ -65,7 +88,9 @@ while ($r = $roles->fetch_assoc()) {
 <?php endwhile; ?>
 </table>
 
-<a href="../panel.php" class="btn btn-secondary mt-3">Volver al panel</a>
+<div style="text-align: center; margin-top: 20px;">
+    <a href="listar.php" class="btn btn-secondary mt-3" style="width: 100px; display: inline-flex; justify-content: center; align-items: center; font-size: 20px;">Volver</a>
+</div>
 
 <?php include '../includes/footer.php'; ?>
 
