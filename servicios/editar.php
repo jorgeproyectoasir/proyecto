@@ -23,8 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->bind_param("sssii", $nombre, $tipo, $estado, $dispositivo, $id);
     $stmt->execute();
 
-    echo "<p class='text-success'>Servicio actualizado correctamente.</p>";
-    echo "<a href='listar.php' class='btn btn-primary'>Volver</a>";
+    header("Location: listar.php?msg=Servicio actualizado correctamente.");
+    exit();
+
     include '../includes/footer.php';
     exit();
 }

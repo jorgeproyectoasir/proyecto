@@ -23,7 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
 
         registrar_log($conexion, $_SESSION["usuario_id"], "Agregó un nuevo servicio: $nombre");
-        $mensaje = "Servicio agregado correctamente.";
+        header("Location: listar.php?msg=Servicio agregado correctamente.");
+        exit();
+
         $stmt->close();
     }
 }

@@ -3,11 +3,22 @@ include '../includes/auth.php';
 include '../includes/header.php';
 include '../conexion.php';
 
-echo "<h2>Listado de Incidencias</h2>";
 
-if (isset($_GET['eliminado']) && $_GET['eliminado'] == 1) {
-    echo "<div class='alert alert-success'>✅ Incidencia eliminada correctamente.</div>";
+echo '<div class="contenido-flex">';
+
+// Contenedor principal (izquierda)
+echo '<div class="panel-container">';
+
+// Mostrar mensaje flash si existe
+if (isset($_SESSION['flash'])) {
+    echo "<div class='alert alert-{$_SESSION['flash']['tipo']} alert-dismissible fade show text-center'>
+            {$_SESSION['flash']['mensaje']}
+            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Cerrar'></button>
+        </div>";
+    unset($_SESSION['flash']);
 }
+
+echo "<h2>Listado de Incidencias</h2>";
 
 // Obtener incidencias
 $sql = "SELECT i.*, u.nombre AS usuario, d.nombre AS dispositivo
@@ -18,9 +29,8 @@ $sql = "SELECT i.*, u.nombre AS usuario, d.nombre AS dispositivo
 $resultado = $conexion->query($sql);
 
 // Mostrar tabla
-echo "<table class='table table-bordered table-striped'>
+echo "<table class='table-accesos'>
 <tr>
-    <th>ID</th>
     <th>Fecha</th>
     <th>Descripción</th>
     <th>Tipo</th>
@@ -32,31 +42,25 @@ echo "<table class='table table-bordered table-striped'>
 
 while ($row = $resultado->fetch_assoc()) {
     echo "<tr>
-        <td>{$row['id']}</td>
         <td>{$row['fecha']}</td>
-        <td>{$row['descripcion']}</td>
-        <td>{$row['tipo']}</td>
+        <td>" . htmlspecialchars($row['descripcion']) . "</td>
+        <td>" . htmlspecialchars($row['tipo']) . "</td>
         <td>
-            <span class='badge bg-" . ($row['estado'] === 'cerrada' ? 'secondary' : 'warning') . "'>
-                " . ucfirst($row['estado']) . "
-            </span>
+            <span class='badge bg-" . ($row['estado'] === 'cerrada' ? 'secondary' : 'warning') . "'>" . ucfirst($row['estado']) . "</span>
         </td>
-        <td>{$row['dispositivo']}</td>
-        <td>{$row['usuario']}</td>
+        <td>" . htmlspecialchars($row['dispositivo'] ?? 'No asignado') . "</td>
+        <td>" . htmlspecialchars($row['usuario'] ?? 'No asignado') . "</td>
         <td>";
 
-    // Botón cerrar si está abierta
     if ($row['estado'] === 'abierta' && ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico')) {
-        echo "<a href='cerrar.php?id={$row['id']}' class='btn btn-warning btn-sm me-2'>Cerrar</a>";
+        echo "<a href='cerrar.php?id={$row['id']}' class='btn-editar btn-accion me-2'>Cerrar</a>";
     }
 
-    // Botón eliminar solo si está cerrada
     if ($row['estado'] === 'cerrada' && ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico')) {
-        echo "<a href='eliminar.php?id={$row['id']}' class='btn btn-danger btn-sm eliminar me-2'>Eliminar</a>";
+        echo "<a href='eliminar.php?id={$row['id']}' class='btn btn-danger btn-accion me-2' onclick=\"return confirm('¿Estás seguro de que deseas eliminar esta incidencia? Esta acción no se puede deshacer.')\">Eliminar</a>";
     }
 
-    // Botón comentarios (siempre visible)
-    echo "<a href='comentarios.php?id={$row['id']}' class='btn btn-info btn-sm'>Comentarios</a>";
+    echo "<a href='comentarios.php?id={$row['id']}' class='btn-ver btn-accion'>Comentarios</a>";
 
     echo "</td></tr>";
 }
@@ -65,11 +69,17 @@ echo "</table>";
 
 // Botón para crear
 if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico') {
-    echo "<a href='crear.php' class='btn btn-success'>Crear nueva incidencia</a>";
+    echo "<a href='crear.php' class='btn btn-success mt-3'>Crear nueva incidencia</a>";
 }
 
 echo "<br><a href='../panel.php' class='btn btn-secondary mt-3'>Volver al panel</a>";
 
+echo '</div>'; // cierre de panel-container
+
+// Aside a la derecha
+include_once __DIR__ . '/../includes/aside.php';
+
+echo '</div>'; // cierre de contenido-flex
+
 include '../includes/footer.php';
 ?>
-

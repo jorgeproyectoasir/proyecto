@@ -3,8 +3,6 @@ include '../includes/auth.php';
 include '../conexion.php';
 require_once '../includes/log.php';
 
-$mensaje = "";
-
 // Obtener id de tarea a editar
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($id <= 0) {
@@ -25,25 +23,19 @@ if (!$tarea) {
     exit();
 }
 
-// Obtener rol numérico actual para comparar niveles
-// admin=1, tecnico=2, usuario=3
+// Verificación de permisos
 $rol_actual = $_SESSION['rol'];
 $roles_nivel = ['admin' => 1, 'tecnico' => 2, 'usuario' => 3];
 $nivel_usuario = $roles_nivel[$rol_actual] ?? 99;
 
-// Verificar permisos: puede editar si es admin,
-// o si es técnico y es el técnico asignado o la creó un rol inferior,
-// o si es usuario y es el creador.
 $puede_editar = false;
 if ($nivel_usuario == 1) {
-    $puede_editar = true; // admin puede todo
+    $puede_editar = true;
 } elseif ($nivel_usuario == 2) {
-    // técnico puede editar si es el técnico asignado o si creó la tarea un usuario
-    if ($tarea['tecnico_id'] == $_SESSION['usuario_id'] || $roles_nivel['usuario'] > $roles_nivel[$rol_actual]) {
+    if ($tarea['tecnico_id'] == $_SESSION['usuario_id'] || $tarea['creador_id'] == $_SESSION['usuario_id']) {
         $puede_editar = true;
     }
 } elseif ($nivel_usuario == 3) {
-    // usuario solo si es creador
     if ($tarea['creador_id'] == $_SESSION['usuario_id']) {
         $puede_editar = true;
     }
@@ -71,15 +63,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
 
         registrar_log($conexion, $_SESSION["usuario_id"], "Editó tarea ID $id: '$titulo'");
-        $mensaje = "Tarea actualizada correctamente.";
 
-        // Recargar datos actualizados
-        $stmt->close();
-        $stmt = $conexion->prepare("SELECT * FROM tareas WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $tarea = $result->fetch_assoc();
+        // Redirigir con mensaje de éxito
+        header("Location: listar.php?editada=1");
+        exit();
     } else {
         $mensaje = "Por favor, rellena todos los campos obligatorios.";
     }
@@ -90,12 +77,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <h2>Editar tarea</h2>
 
 <?php if (!empty($mensaje)): ?>
-    <div class="alert <?= strpos($mensaje, 'correctamente') !== false ? 'alert-success' : 'alert-danger' ?> mt-3">
+    <div class="alert alert-danger mt-3">
         <?= htmlspecialchars($mensaje) ?>
     </div>
 <?php endif; ?>
 
-<form method="POST" class="mt-3">
+<form method="POST" class="form-bordered mt-3">
     <label>Título:</label><br>
     <input type="text" name="titulo" value="<?= htmlspecialchars($tarea['titulo']) ?>" required><br><br>
 

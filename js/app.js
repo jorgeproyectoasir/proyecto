@@ -46,3 +46,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+function mostrarToast(tipo, mensaje) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${tipo}`;
+    toast.innerText = mensaje;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
+
+// Mostrar desde PHP si hay flash
+document.addEventListener("DOMContentLoaded", function () {
+    const flash = document.getElementById("flash-data");
+    if (flash) {
+        const tipo = flash.dataset.tipo;
+        const mensaje = flash.dataset.mensaje;
+        mostrarToast(tipo, mensaje);
+    }
+});

@@ -2,6 +2,7 @@
 include '../includes/auth.php';
 include '../includes/header.php';
 require_once '../includes/log.php';
+include '../conexion.php';
 
 if (!in_array($_SESSION['rol'], ['admin', 'tecnico', 'usuario'])) {
     echo "Acceso denegado.";
@@ -9,27 +10,28 @@ if (!in_array($_SESSION['rol'], ['admin', 'tecnico', 'usuario'])) {
     exit();
 }
 
-
-include '../conexion.php';
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $descripcion = $_POST['descripcion'];
     $tipo = $_POST['tipo'];
     $dispositivo = $_POST['dispositivo'];
-    $usuario_id = $_SESSION["usuario_id"]; // usuario logueado
+    $usuario_id = $_SESSION["usuario_id"];
 
     $stmt = $conexion->prepare("INSERT INTO incidencias (descripcion, tipo, dispositivo_id, usuario_id) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("ssii", $descripcion, $tipo, $dispositivo, $usuario_id);
     $stmt->execute();
 
-    echo "<p class='text-success'>Incidencia registrada correctamente.</p>";
-    echo "<a href='listar.php' class='btn btn-primary'>Volver al listado</a>";
-    include '../includes/footer.php';
+    $nueva_id = $stmt->insert_id;
+
+    registrar_log($conexion, $usuario_id, 'Reportó incidencia "' . $descripcion . '"');
+    require_once '../includes/historial.php';
+    registrar_historial($conexion, $usuario_id, 'incidencia', $nueva_id, 'creada');
+
+    // ✅ Redirige con mensaje
+    header("Location: listar.php?creada=1");
     exit();
 }
 
 $dispositivos = $conexion->query("SELECT id, nombre FROM dispositivos");
-registrar_log($conexion, $_SESSION["usuario_id"], 'Reportó incidencia "' . $descripcion . '"');
 ?>
 
 <h2>Crear nueva incidencia</h2>

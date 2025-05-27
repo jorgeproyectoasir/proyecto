@@ -13,42 +13,42 @@ if ($rol !== 'admin' && $rol !== 'tecnico') {
     exit();
 }
 
-// Mostrar últimos 30 logs con más detalles
-$sql = "SELECT logs.*, usuarios.nombre AS usuario
+// Mostrar últimos 30 logs
+$sql = "SELECT logs.fecha, usuarios.nombre AS usuario, logs.accion
         FROM logs
         LEFT JOIN usuarios ON logs.usuario_id = usuarios.id
         ORDER BY fecha DESC
         LIMIT 30";
-
 $resultado = $conexion->query($sql);
 ?>
 
-<h2>Registro de actividad</h2>
+<div class="contenido-flex">
+    <div class="panel-container">
+        <h2>Registro de actividad</h2>
 
-<table class='table table-striped'>
-    <tr>
-        <th>Fecha</th>
-        <th>Usuario</th>
-        <th>Acción</th>
-        <th>Entidad</th>
-        <th>Detalle</th>
-        <th>IP</th>
-        <th>Navegador</th>
-    </tr>
-    <?php while ($log = $resultado->fetch_assoc()): ?>
-        <tr>
-            <td><?= $log['fecha'] ?></td>
-            <td><?= htmlspecialchars($log['usuario'] ?? 'Desconocido') ?></td>
-            <td><?= htmlspecialchars($log['accion']) ?></td>
-            <td><?= htmlspecialchars($log['entidad_afectada'] ?? '-') ?></td>
-            <td><?= htmlspecialchars($log['detalle_extra'] ?? '-') ?></td>
-            <td><?= $log['ip'] ?></td>
-            <td><?= substr(htmlspecialchars($log['user_agent']), 0, 40) ?>...</td>
-        </tr>
-    <?php endwhile; ?>
-</table>
+        <table class="table-accesos">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($log = $resultado->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= $log['fecha'] ?></td>
+                        <td><?= htmlspecialchars($log['usuario'] ?? 'Desconocido') ?></td>
+                        <td><?= htmlspecialchars($log['accion']) ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
 
-<a href='../panel.php' class='btn btn-secondary mt-3'>Volver al panel</a>
+        <a href='../panel.php' class='btn btn-secondary mt-3'>Volver al panel</a>
+    </div>
+
+    <?php include_once '../includes/aside.php'; ?>
+</div>
 
 <?php include '../includes/footer.php'; ?>
-

@@ -2,8 +2,10 @@
 include '../includes/auth.php';
 include '../includes/header.php';
 require_once '../includes/log.php';
+session_start();
+
 if ($_SESSION['rol'] !== 'admin' && $_SESSION['rol'] !== 'tecnico') {
-    echo "Acceso denegado.";
+    echo "<p class='alert alert-danger text-center'>❌ Acceso denegado.</p>";
     include '../includes/footer.php';
     exit();
 }
@@ -12,28 +14,42 @@ include '../conexion.php';
 
 // Procesar formulario
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $nombre = $_POST['nombre'];
+    $nombre = trim($_POST['nombre']);
     $ip = trim($_POST['ip']);
-
-    if (!preg_match('/^\d{1,3}(\.\d{1,3}){3}$/', $ip)) {
-       echo "<p class='text-danger'>IP inválida. Debe tener el formato correcto, como 192.168.0.1</p>";
-       include '../includes/footer.php';
-       exit();
-    }
-
-    $tipo = $_POST['tipo'];
+    $tipo = trim($_POST['tipo']);
     $estado = $_POST['estado'];
     $responsable = $_POST['responsable'];
 
+    // Validación de la IP
+    if (!preg_match('/^\d{1,3}(\.\d{1,3}){3}$/', $ip)) {
+        $_SESSION['flash'] = [
+            'tipo' => 'danger',
+            'mensaje' => '❌ IP inválida. Debe tener el formato correcto, como 192.168.0.1'
+        ];
+        header("Location: agregar.php");
+        exit();
+    }
+
+    // Insertar dispositivo en la base de datos
     $stmt = $conexion->prepare("INSERT INTO dispositivos (nombre, ip, tipo, estado, responsable) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssi", $nombre, $ip, $tipo, $estado, $responsable);
-    $stmt->execute();
-    
-    registrar_log($conexion, $_SESSION["usuario_id"], 'Agregó dispositivo ' . $nombre);
-    echo "<p class='text-success'>Dispositivo registrado correctamente.</p>";
-    echo "<a href='listar.php' class='btn btn-primary'>Volver al listado</a>";
 
-    include '../includes/footer.php';
+    if ($stmt->execute()) {
+        registrar_log($conexion, $_SESSION["usuario_id"], "Agregó dispositivo $nombre");
+
+        $_SESSION['flash'] = [
+            'tipo' => 'success',
+            'mensaje' => "✅ Dispositivo agregado correctamente."
+        ];
+    } else {
+        $_SESSION['flash'] = [
+            'tipo' => 'danger',
+            'mensaje' => "❌ Error al agregar dispositivo."
+        ];
+    }
+
+    $stmt->close();
+    header("Location: listar.php");
     exit();
 }
 
@@ -43,37 +59,36 @@ $res = $conexion->query("SELECT id, nombre FROM usuarios");
 
 <h2>Registrar nuevo dispositivo</h2>
 
-<form method="POST">
-    <div class="mb-3">
-        <label>Nombre del dispositivo:</label>
-        <input type="text" name="nombre" class="form-control" required>
+<!-- Mostrar mensaje flash si existe -->
+<?php if (isset($_SESSION['flash'])): ?>
+    <div class="alert alert-<?= $_SESSION['flash']['tipo'] ?> text-center">
+        <?= $_SESSION['flash']['mensaje'] ?>
     </div>
+    <?php unset($_SESSION['flash']); ?>
+<?php endif; ?>
+
+<form method="POST" action="" class="login-form">
     <div class="mb-3">
-        <label>IP:</label>
-        <input type="text" name="ip" id="ip" required pattern="\d{1,3}(\.\d{1,3}){3}" title="Debe tener el formato: 192.168.0.1">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" class="form-control" required>
     </div>
+
     <div class="mb-3">
-        <label>Tipo:</label>
-        <input type="text" name="tipo" class="form-control" placeholder="Servidor, Switch..." required>
+        <label for="email">Correo:</label>
+        <input type="email" id="email" name="email" class="form-control" required>
     </div>
+
     <div class="mb-3">
-        <label>Estado:</label>
-        <select name="estado" class="form-control">
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-            <option value="mantenimiento">Mantenimiento</option>
-        </select>
+        <label for="password">Contraseña:</label>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="password" id="password" name="password" class="form-control" required>
+            <button type="button" id="togglePassword" class="btn">Mostrar</button>
+        </div>
     </div>
-    <div class="mb-3">
-        <label>Responsable:</label>
-        <select name="responsable" class="form-control">
-            <?php while ($fila = $res->fetch_assoc()): ?>
-                <option value="<?= $fila['id'] ?>"><?= $fila['nombre'] ?></option>
-            <?php endwhile; ?>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-success">Guardar</button>
+
+    <button type="submit" class="btn">Registrarse</button>
 </form>
+
 
 <a href="listar.php" class="btn btn-secondary mt-3">Cancelar</a>
 

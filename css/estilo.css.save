@@ -15,17 +15,16 @@ body {
 }
 
 footer {
-    
-    background: #004085;;
-    height: 180px;
+    border-top: 3px solid #0d6efd;
+    font-size: 0.95rem;
+    background-color: 
 }
 footer p {
-    color: white;
-    font-weight: bold;
+    margin: 0;
+    padding: 0.3rem 0;
 }
-
 .header-container {
-    max-width: 1500px; /* o el ancho que tú quieras */
+    max-width: 1200px; /* o el ancho que tú quieras */
     margin: 0 auto;
     padding: 0 20px;
     color: white;
@@ -34,23 +33,18 @@ footer p {
 .button-container {
     display: flex;
     justify-content: start; /* Alineación a la izquierda */
-    gap: 20px; /* Espacio entre los botones */
+    gap: 10px; /* Espacio entre los botones */
+    margin-top: 10px; /* Espaciado adecuado debajo de contraseña */
 }
 
 .btn-toggle-password, .btn-primary {
     width: auto; /* Evita que ocupen todo el ancho */
 }
 
-.btn-inline {
-  display: inline-block;
-  width: auto;
-}
-
-
 .text-end.fs-5 {
-    font-size: 2em !important;
+    font-size: 1.5em !important;
     display: flex;
-    gap: 50px; /* Espacio entre los elementos */
+    gap: 40px; /* Espacio entre los elementos */
 }
 
 .display-5 {
@@ -61,13 +55,17 @@ footer p {
     width: 90%;
     max-width: 800px;
     margin: 40px auto;
+    background: white;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     border-radius: 8px;
 }
 
 /* === Encabezados === */
-
+h1, h2, h3 {
+    text-align: center;
+    color: #004085;
+}
 
 /* === Formularios generales === */
 form {
@@ -199,7 +197,7 @@ aside {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Fuerza 3 columnas */
     gap: 15px;
-    margin-top: 60px;
+    margin-top: 10px;
 }
 
 
@@ -240,8 +238,10 @@ aside {
 }
 
 .login-form {
+    background-color: #f0f4ff;
     padding: 30px;
     border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 
@@ -266,7 +266,8 @@ aside {
 
 .btn-toggle-password {
     display: block;
-    width: auto;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
 .btn-toggle-password:hover {
@@ -287,15 +288,17 @@ aside {
     border: 1px solid #c3e6cb;
 }
 
-
-
 .table-accesos th, .table-accesos td {
     font-size: 28px !important; /* O el tamaño que prefieras */
     padding: 20px !important; /* Aumenta el espacio interno */
 }
 
-
-
+.table-accesos {
+    width: 60%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    font-size: 26px;
+}
 
 .table-accesos th {
     background-color: #004085;
@@ -321,7 +324,7 @@ aside {
     display: flex;
     justify-content: center;
     gap: 10px; /* Espacio entre botones */
-    margin-top: 10px;
+    margin-top: 20px;
     flex-wrap: wrap; /* Opcional para que se acomoden si hay muchos */
 }
 
@@ -363,11 +366,10 @@ aside {
 
 .panel-card {
     display: flex;
-    font-weight: bold;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-size: 35px;
+    font-size: 36px;
     padding: 15px;
     margin: 10px;
     background-color: #004085; /* Azul oscuro */
@@ -391,8 +393,7 @@ aside {
 
 .logout {
     display: inline-block;
-    font-size: 35px;
-    font-weight: bold;
+    font-size: 26px;
     padding: 20px 40px;
     background-color: #b71c1c;
     color: white;
@@ -447,6 +448,7 @@ aside {
     flex-direction: column;
     justify-content: center;
     padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);em;
     font-weight: bold;
     color: #2c3e50;
     margin-bottom: 5px;
@@ -470,7 +472,7 @@ aside {
 }
 .login-form input {
     width: 100%;
-    
+    box-sizing: border-box;
 }
 .btn-toggle-password {
     position: absolute;
@@ -518,10 +520,14 @@ aside {
     padding: 8px 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
-    font-size: 16px; 
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-control:focus {
+    border-color: #007bff; /* Azul Bootstrap */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Resplandor azul suave */
     outline: none;
 }
 
@@ -529,4 +535,7 @@ aside {
     position: relative;
     width: 100%;
 }
+
+
+
 
