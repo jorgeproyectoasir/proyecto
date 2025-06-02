@@ -4,15 +4,33 @@ include '../includes/header.php';
 include '../conexion.php';
 require_once '../includes/log.php';
 
+echo "<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF;
+    }
+
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+</style>";
 echo '<div class="contenido-flex">';
 echo '<div class="panel-container">';
 
-// Mostrar mensaje flash (si viene por GET)
+// Mensaje flash
 if (isset($_GET['msg'])) {
     echo "<div class='alert alert-success mt-3'>" . htmlspecialchars($_GET['msg']) . "</div>";
 }
 
-// Eliminar servicio (solo administradores)
+// Eliminar servicio (solo admin)
 if (isset($_GET['eliminar']) && $_SESSION['rol'] === 'admin') {
     $id = intval($_GET['eliminar']);
     $stmt = $conexion->prepare("DELETE FROM servicios WHERE id = ?");
@@ -23,13 +41,13 @@ if (isset($_GET['eliminar']) && $_SESSION['rol'] === 'admin') {
 }
 
 // Título
-echo "<h2>Listado de Servicios</h2>";
+echo "<h2 class='titulos'>Listado de Servicios</h2>";
 
-// Obtener servicios
+// Consulta de servicios
 $sql = "SELECT * FROM servicios";
 $resultado = $conexion->query($sql);
 
-// Mostrar tabla
+// Tabla
 echo "<table class='table-accesos'>
 <tr>
     <th>ID</th>
@@ -42,21 +60,22 @@ echo "<table class='table-accesos'>
 
 while ($row = $resultado->fetch_assoc()) {
     echo "<tr>
+
         <td>{$row['id']}</td>
-        <td>{$row['nombre']}</td>
-        <td>{$row['descripcion']}</td>
+        <td>" . htmlspecialchars($row['nombre']) . "</td>
+        <td>" . htmlspecialchars($row['descripcion']) . "</td>
         <td>" . ($row['tipo'] ?? '<em>No definido</em>') . "</td>
         <td>" . ucfirst($row['estado']) . "</td>
         <td>";
 
-    // Editar: técnicos y admins
+    // Editar
     if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico') {
-        echo "<a href='editar.php?id={$row['id']}' class='btn btn-warning btn-sm me-2'>Editar</a>";
+        echo "<a href='editar.php?id={$row['id']}' class='btn me-2' style='background-color: #0d6efd; color: white; font-weight: bold;'>Editar</a>";
     }
 
-    // Eliminar: solo admins
+    // Eliminar
     if ($_SESSION['rol'] === 'admin') {
-        echo "<a href='listar.php?eliminar={$row['id']}' class='btn btn-danger btn-sm eliminar'>Eliminar</a>";
+        echo "<a href='listar.php?eliminar={$row['id']}' class='btn btn-danger eliminar' style='font-weight: bold;' onclick=\"return confirm('¿Estás seguro de eliminar este servicio?');\">Eliminar</a>";
     }
 
     echo "</td></tr>";
@@ -64,19 +83,19 @@ while ($row = $resultado->fetch_assoc()) {
 
 echo "</table>";
 
-// Botón agregar
+// Botones centrados como en usuarios
+echo "<div style='text-align: center; margin-top: 20px;'>";
+
 if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico') {
-    echo "<a href='agregar.php' class='btn btn-success'>Agregar nuevo servicio</a>";
+    echo "<a href='agregar.php' class='btn btn-success me-2' style='min-width: 180px; font-weight: bold; font-size:1.2em;'>Agregar nuevo servicio</a>";
 }
 
-echo "<br><a href='../panel.php' class='btn btn-secondary mt-3'>Volver al panel</a>";
+echo "<a href='../panel.php' class='btn btn-secondary' style='min-width: 180px; font-weight: bold; font-size:1.2em;'>Volver al panel</a>";
+echo "</div>";
 
 echo '</div>'; // panel-container
-
-// Cargar el aside
 include_once '../includes/aside.php';
-
 echo '</div>'; // contenido-flex
-
 include '../includes/footer.php';
 ?>
+

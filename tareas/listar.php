@@ -1,5 +1,22 @@
 <?php
 include '../includes/auth.php';
+include '../includes/header.php';
+echo "<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF; /* Fondo azul claro global */
+    }
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+</style>";
 include '../conexion.php';
 require_once '../includes/log.php';
 
@@ -8,10 +25,9 @@ registrar_log($conexion, $_SESSION["usuario_id"], "Consultó tareas programadas"
 $rol = $_SESSION['rol'];
 $usuario_id = $_SESSION['usuario_id'];
 
-// Mensajes de éxito o error
+// Mensajes flash
 $mensaje = '';
 $tipo_mensaje = 'success';
-
 if (isset($_GET['creada'])) {
     $mensaje = "Tarea creada correctamente.";
 } elseif (isset($_GET['editada'])) {
@@ -55,11 +71,10 @@ if ($rol === 'admin' || $rol === 'tecnico') {
 }
 ?>
 
-<?php include '../includes/header.php'; ?>
-
 <div class="contenido-flex">
     <div class="panel-container">
-        <h2>Tareas programadas</h2>
+
+        <h2 class="titulos">Listado de Tareas</h2>
 
         <?php if (!empty($mensaje)): ?>
             <div class="alert alert-<?= $tipo_mensaje ?> mt-3">
@@ -68,32 +83,34 @@ if ($rol === 'admin' || $rol === 'tecnico') {
         <?php endif; ?>
 
         <table class="table-accesos">
-            <tr>
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <?php if ($rol === 'admin'): ?>
-                    <th>Técnico</th>
-                <?php endif; ?>
-                <th>Acciones</th>
-            </tr>
-
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <?php if ($rol === 'admin'): ?>
+                        <th>Técnico</th>
+                    <?php endif; ?>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
             <?php while ($fila = $resultado->fetch_assoc()): ?>
                 <tr>
+                    <td><?= $fila['id'] ?></td>
                     <td><?= htmlspecialchars($fila['titulo']) ?></td>
                     <td><?= htmlspecialchars($fila['descripcion']) ?></td>
                     <td><?= $fila['programada_para'] ?></td>
                     <td>
-                        <?= $fila['estado'] === 'completada'
-                            ? "<span class='badge bg-success'>Completada</span>"
-                            : "<span class='badge bg-warning text-dark'>Pendiente</span>" ?>
+                        <span class="badge <?= $fila['estado'] === 'completada' ? 'bg-secondary' : 'bg-warning' ?>">
+                            <?= ucfirst($fila['estado']) ?>
+                        </span>
                     </td>
-
                     <?php if ($rol === 'admin'): ?>
                         <td><?= htmlspecialchars($fila['tecnico']) ?></td>
                     <?php endif; ?>
-
                     <td>
                         <?php
                         $creador_id = $fila['creador_id'] ?? null;
@@ -105,34 +122,47 @@ if ($rol === 'admin' || $rol === 'tecnico') {
                         ?>
 
                         <?php if ($puede_editar): ?>
-                            <a href="editar.php?id=<?= $fila['id'] ?>" class="btn btn-warning btn-sm me-1">Editar</a>
+                            <a href="editar.php?id=<?= $fila['id'] ?>"
+                               class="btn btn-sm me-2"
+                               style="background-color: #0d6efd; color: white; font-weight: bold;">Editar</a>
                         <?php endif; ?>
 
-                        <a href="comentarios.php?id=<?= $fila['id'] ?>" class="btn btn-info btn-sm me-1">Comentarios</a>
+                        <a href="comentarios.php?id=<?= $fila['id'] ?>"
+                           class="btn btn-sm me-2"
+                           style="background-color: #0dcaf0; color: white; font-weight: bold;">Comentarios</a>
 
-                        <?php if ($fila['estado'] === 'completada'): ?>
-                            <a href="eliminar.php?id=<?= $fila['id'] ?>" class="btn btn-danger btn-sm eliminar">Eliminar</a>
+                        <?php if ($fila['estado'] === 'completada' && $rol === 'admin'): ?>
+                            <a href="eliminar.php?id=<?= $fila['id'] ?>"
+                               class="btn btn-danger btn-sm eliminar"
+                               style="font-weight: bold;"
+                               onclick="return confirm('¿Estás seguro de eliminar esta tarea?');">Eliminar</a>
                         <?php endif; ?>
 
                         <?php if ($fila['estado'] === 'pendiente' && ($rol === 'admin' || $rol === 'tecnico')): ?>
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="completar_id" value="<?= $fila['id'] ?>">
-                                <button type="submit" class="btn btn-success btn-sm">✔ Completar</button>
+                                <button type="submit" class="btn btn-sm"
+                                        style="background-color: #198754; color: white; font-weight: bold;">Completar
+                                </button>
                             </form>
                         <?php endif; ?>
                     </td>
                 </tr>
             <?php endwhile; ?>
+            </tbody>
         </table>
 
-        <?php if ($rol === 'admin' || $rol === 'tecnico'): ?>
-            <a href='crear.php' class='btn btn-success mt-2'>Crear nueva tarea</a>
-        <?php endif; ?>
+        <div style="text-align: center; margin-top: 20px;">
+            <?php if ($rol === 'admin' || $rol === 'tecnico'): ?>
+                <a href="crear.php" class="btn btn-success me-2" style="min-width: 180px; font-weight: bold;">Crear nueva tarea</a>
+            <?php endif; ?>
+            <a href="../panel.php" class="btn btn-secondary" style="min-width: 180px; font-weight: bold;">Volver al panel</a>
+        </div>
 
-        <br><a href='../panel.php' class='btn btn-secondary mt-3'>Volver al panel</a>
     </div>
 
     <?php include_once '../includes/aside.php'; ?>
 </div>
 
 <?php include '../includes/footer.php'; ?>
+

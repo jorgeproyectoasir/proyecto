@@ -3,6 +3,22 @@ include '../includes/auth.php';
 include '../includes/header.php';
 include '../conexion.php';
 require_once '../includes/log.php';
+echo "<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF; /* Fondo azul claro global */
+    }
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+</style>";
 
 session_start();
 
@@ -53,7 +69,7 @@ while ($r = $roles->fetch_assoc()) {
 }
 ?>
 
-<h2>Asignar roles a usuarios</h2>
+<h2 class="titulos">Asignar roles a usuarios</h2>
 <style>
   h2 {
     font-size: 3rem;
@@ -81,7 +97,7 @@ while ($r = $roles->fetch_assoc()) {
         </td>
         <td>
             <input type="hidden" name="usuario_id" value="<?= $u['id'] ?>">
-            <button type="submit" class="btn btn-primary btn-sm">Actualizar</button>
+            <button type="submit" class="btn btn-primary btn-sm" style="font-weight: bold;">Actualizar</button>
         </td>
     </form>
 </tr>
@@ -89,7 +105,7 @@ while ($r = $roles->fetch_assoc()) {
 </table>
 
 <div style="text-align: center; margin-top: 20px;">
-    <a href="listar.php" class="btn btn-secondary mt-3" style="width: 100px; display: inline-flex; justify-content: center; align-items: center; font-size: 20px;">Volver</a>
+    <a href="listar.php" class="btn btn-secondary mt-3" style="width: 100px; display: inline-flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold;">Volver</a>
 </div>
 
 <?php include '../includes/footer.php'; ?>

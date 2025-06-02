@@ -17,9 +17,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (toggleBtn && passwordInput) {
         toggleBtn.addEventListener("click", function () {
-            const tipo = passwordInput.type === "password" ? "text" : "password";
-            passwordInput.type = tipo;
-            toggleBtn.textContent = tipo === "password" ? "Mostrar" : "Ocultar";
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+
+            // Cambiar icono
+            const icon = document.getElementById("toggleIcon");
+            if (icon) {
+                icon.className = isPassword ? "bi bi-eye-slash" : "bi bi-eye";
+            }
+
+            // Cambiar texto sin romper el botón
+            const textoSpan = this.querySelector("span.texto");
+            if (textoSpan) {
+                textoSpan.textContent = isPassword ? " Ocultar" : " Mostrar";
+            }
         });
     }
 
@@ -44,8 +55,17 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    // Mostrar flash de PHP como toast animado
+    const flash = document.getElementById("flash-data");
+    if (flash) {
+        const tipo = flash.dataset.tipo;
+        const mensaje = flash.dataset.mensaje;
+        mostrarToast(tipo, mensaje);
+    }
 });
 
+// Función para mostrar toast
 function mostrarToast(tipo, mensaje) {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -61,12 +81,3 @@ function mostrarToast(tipo, mensaje) {
     }, 5000);
 }
 
-// Mostrar desde PHP si hay flash
-document.addEventListener("DOMContentLoaded", function () {
-    const flash = document.getElementById("flash-data");
-    if (flash) {
-        const tipo = flash.dataset.tipo;
-        const mensaje = flash.dataset.mensaje;
-        mostrarToast(tipo, mensaje);
-    }
-});

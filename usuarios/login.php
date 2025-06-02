@@ -5,7 +5,6 @@ require_once '../includes/log.php';
 
 $ip = $_SERVER['REMOTE_ADDR'];
 
-// Verificar si hay demasiados intentos fallidos
 function estaBloqueado($conexion, $email, $ip) {
     $stmt = $conexion->prepare("SELECT intentos, bloqueado_hasta FROM intentos_login WHERE email = ? AND ip = ?");
     $stmt->bind_param("ss", $email, $ip);
@@ -29,6 +28,7 @@ function registrarIntento($conexion, $email, $ip) {
     if ($row = $resultado->fetch_assoc()) {
         $intentos = $row['intentos'] + 1;
         $bloqueado = $intentos >= 5 ? date('Y-m-d H:i:s', strtotime('+15 minutes')) : null;
+
         $stmt2 = $conexion->prepare("UPDATE intentos_login SET intentos = ?, ultimo_intento = NOW(), bloqueado_hasta = ? WHERE id = ?");
         $stmt2->bind_param("isi", $intentos, $bloqueado, $row['id']);
         $stmt2->execute();

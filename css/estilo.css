@@ -8,7 +8,6 @@ header {
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f7fa;
     color: #333;
     margin: 0;
     padding: 0;
@@ -36,6 +35,28 @@ footer p {
     justify-content: start; /* Alineación a la izquierda */
     gap: 20px; /* Espacio entre los botones */
 }
+.botones-centrados {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.boton-accion {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.boton-accion:hover {
+    background-color: #0056b3;
+}
 
 .btn-toggle-password, .btn-primary {
     width: auto; /* Evita que ocupen todo el ancho */
@@ -62,7 +83,6 @@ footer p {
     max-width: 800px;
     margin: 40px auto;
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
     border-radius: 8px;
 }
 
@@ -85,21 +105,7 @@ input, select, textarea {
     width: 100%;
 }
 
-/* === Botones === */
-button, .btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px;
-    text-align: center;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
 
-button:hover, .btn:hover {
-    background-color: #0056b3;
-}
 
 /* === Tablas === */
 table {
@@ -122,15 +128,10 @@ th {
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
-
 /* === Enlaces === */
 a {
     color: #007bff;
     text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
 }
 
 
@@ -162,9 +163,9 @@ a:hover {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 40px;
-    margin: 40px auto;
-    max-width: 1800px;
+    gap: 60px;
+    margin: 20px auto;
+    max-width: 1700px;
     padding: 20px;
 }
 
@@ -172,33 +173,65 @@ a:hover {
     flex: 1.5;
 }
 
-aside {
-    flex: 1.5;
+.aside-estandar {
+    width: 400px;
+    flex: 0 0 400px; /* No crecer, no encoger, ancho fijo */
     background-color: #f9f9f9;
     padding: 20px;
-    font-size: 30px;
+    font-size: 25px;
     border-radius: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
+    border-left: 2px solid #ccc;
+    margin-left: 20px;
+    box-sizing: border-box;
+}
+
+.aside-estandar h3 {
+    margin-top: 0;
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.aside-estandar p {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.aside-img {
+    max-width: 100%;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 .bienvenida {
-    font-size: 50px;
+font-size: 48px;         /* Un poco más grande */
+    text-align: center;
+    font-weight: 900;        /* Más grueso */
+    color: #003366;          /* Azul más oscuro */
+    margin-bottom: 40px;     /* Más espacio debajo */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.titulos {
+    font-size: 60px;
+    text-align: center;
     font-weight: bold;
     color: #333;
-    margin-bottom: 5px;
 }
 
 .rol {
     font-size: 30px;
     font-weight: bold;
     color: #555;
-    margin-bottom: 25px;
+    margin-bottom: 10px;
 }
 
 .panel-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr); /* Fuerza 3 columnas */
-    gap: 15px;
+    gap: 25px;
     margin-top: 60px;
 }
 
@@ -286,16 +319,10 @@ aside {
     color: #155724;
     border: 1px solid #c3e6cb;
 }
-
-
-
 .table-accesos th, .table-accesos td {
-    font-size: 28px !important; /* O el tamaño que prefieras */
-    padding: 20px !important; /* Aumenta el espacio interno */
+    padding: 20px;
+    font-size: 28px;
 }
-
-
-
 
 .table-accesos th {
     background-color: #004085;
@@ -317,48 +344,48 @@ aside {
     background-color: #c0d6ec; /* Azul oscuro */
 }
 
-.botones-usuarios {
+
+.botones-usuarios, .botones-centrados {
     display: flex;
     justify-content: center;
     gap: 10px; /* Espacio entre botones */
     margin-top: 10px;
     flex-wrap: wrap; /* Opcional para que se acomoden si hay muchos */
 }
-
-
-.btn + .btn {
-    margin: 10px;
-}
-
-.btn-ver {
-  background-color: #0d6efd;
-  color: white;
+/* Estilo base común para todos los botones */
+.btn-accion {
+  display: inline-block;
   padding: 6px 12px;
   border-radius: 4px;
   text-decoration: none;
-  display: inline-block;
+  color: white;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  margin: 6px 0;
 }
-
+/* Variante VER (azul) */
+.btn-ver {
+  background-color: #0d6efd;
+}
 .btn-ver:hover {
   background-color: #0b5ed7;
 }
-
+/* Variante EDITAR (verde menta) */
 .btn-editar {
   background-color: #20c997;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 4px;
-  text-decoration: none;
-  display: inline-block;
 }
 
 .btn-editar:hover {
   background-color: #17a2b8;
 }
 
-.btn-accion {
-  margin: 6px 0; /* margen arriba y abajo */
-  display: inline-block;
+/* Variante ELIMINAR (rojo) */
+.btn-danger {
+  background-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #b02a37;
 }
 
 .panel-card {
@@ -368,8 +395,8 @@ aside {
     justify-content: center;
     gap: 10px;
     font-size: 35px;
-    padding: 15px;
-    margin: 10px;
+    padding: 20px;
+    margin: 12.5px;
     background-color: #004085; /* Azul oscuro */
     color: white;
     text-decoration: none;
@@ -402,7 +429,7 @@ aside {
 }
 
 .logout:hover {
-    background-color: darkred;
+    background-color: darkred !important;
 }
 
 
@@ -424,7 +451,7 @@ aside {
 .img-lateral {
     height: 600px;
     width: 100%;
-    max-width: 700px; /* más ancha */
+    max-width: 900px; /* más ancha */
     border-radius: 12px;
     object-fit: cover;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -454,7 +481,7 @@ aside {
 }
 
 .login-subtitulo {
-    font-size: 2.5em;
+    font-size: 3em;
     font-weight: bold;
     color: #555;
     text-align: center;
@@ -462,7 +489,7 @@ aside {
 }
 
 .login-form label {
-    font-size: 2em;
+    font-size: 2.5em;
     font-weight: bold;
     display: flex;
     flex-direction: column;
@@ -502,7 +529,7 @@ aside {
 }
 /* Botón Iniciar sesión destacado */
 .login-form button[type="submit"] {
-    font-size: 2em;
+    font-size: 3em;
     font-weight: bold;
     padding: 14px;
     background-color: #007bff;
@@ -518,7 +545,7 @@ aside {
     padding: 8px 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
-    font-size: 16px; 
+    font-size: 200px; 
 }
 
 .form-control:focus {

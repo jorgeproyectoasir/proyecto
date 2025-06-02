@@ -1,98 +1,211 @@
-<?php
-include '../includes/header.php';
-include_once("../conexion.php");
-session_start();
-
-$mensaje = "";
-$claseMensaje = "alert";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nombre = trim($_POST["nombre"]);
-    $email = trim($_POST["email"]);
-    $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-
-    $consulta = $conn->prepare("SELECT * FROM usuarios WHERE email = ?");
-    $consulta->bind_param("s", $email);
-    $consulta->execute();
-    $resultado = $consulta->get_result();
-
-    if ($resultado->num_rows > 0) {
-        $_SESSION['flash'] = [
-            'tipo' => 'danger',
-            'mensaje' => '❌ Ya existe un usuario con ese correo.'
-        ];
-    } else {
-        $rol_id = 3;
-        $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, contraseña, rol_id) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("sssi", $nombre, $email, $password, $rol_id);
-
-        if ($stmt->execute()) {
-            $_SESSION['flash'] = [
-                'tipo' => 'success',
-                'mensaje' => '✅ Registro exitoso. Ya puedes iniciar sesión.'
-            ];
-        } else {
-            $_SESSION['flash'] = [
-                'tipo' => 'danger',
-                'mensaje' => '❌ Error al registrar usuario.'
-            ];
-        }
-        $stmt->close();
-    }
-
-    $consulta->close();
-    header("Location: listar.php");
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Registro</title>
-    <link rel="stylesheet" href="../css/estilo.css">
+  <meta charset="UTF-8">
+  <title>Plataforma IT</title>
+  <link rel="stylesheet" href="/css/estilo.css?v=1748854650">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="../js/app.js" defer></script>
 </head>
 <body>
-    <h1 style="text-align: center; font-size: 4em; font-weight: bold;">Registrar nuevo usuario</h1>
 
-    <?php if (isset($_SESSION['flash'])): ?>
-        <div class="alert alert-<?= $_SESSION['flash']['tipo'] ?> text-center">
-            <?= $_SESSION['flash']['mensaje'] ?>
-        </div>
-        <?php unset($_SESSION['flash']); ?>
-    <?php endif; ?>
+<header>
+  <div class="header-container d-flex justify-content-between align-items-center px-4">
+    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
+    <div class="text-end fs-5">
+      <div><strong>Usuario:</strong> Jorge Admin</div>
+      <div><strong>Rol:</strong> admin</div>
+      <div><strong>Fecha:</strong> 02/06/2025 10:57</div>
+    </div>
+  </div>
+</header>
 
-    <form method="POST" action="" style="max-width: 700px; margin: 0 auto; font-size: 3em;">
+<!-- === CONTENIDO PRINCIPAL === -->
+<div class="w-100 px-4 mt-4">
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF;
+        font-family: Arial, sans-serif;
+    }
+
+    .titulos {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 2em;
+        color: #333;
+    }
+
+    .panel-container {
+        max-width: 700px;
+        margin: 30px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        padding: 30px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    .mb-3 {
+        margin-bottom: 20px;
+    }
+
+    .botones-centrados {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .boton-accion {
+        min-width: 160px;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .btn-success {
+        background-color: #198754;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: gray;
+        color: white;
+    }
+</style>
+
+<!-- ✅ FORMULARIO REGISTRO -->
+<div class="contenido-flex">
+<div class="panel-container">
+
+    <h2 class="titulos">Registrar nuevo usuario</h2>
+
+    <form method="POST" action="procesar_registro.php">
         <div class="mb-3">
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" class="form-control" required>
+            <label>Nombre:</label>
+            <input type="text" name="nombre" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label for="email">Correo:</label>
-            <input type="email" id="email" name="email" class="form-control" required>
+            <label>Correo electrónico:</label>
+            <input type="email" name="email" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label for="password">Contraseña:</label>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <input type="password" id="password" name="password" class="form-control" required>
-                <button type="button" id="togglePassword" class="btn btn-secondary">Mostrar</button>
-            </div>
+            <label>Contraseña:</label>
+            <input type="password" name="contrasena" class="form-control" required>
         </div>
 
-        <!-- Botones alineados -->
-        <div style="display: flex; justify-content: center; gap: 30px; margin-top: 20px;">
-            <button type="submit" class="btn" style="background-color: #198754; color: white; min-width: 150px;">Registrarse</button>
-            <a href="listar.php" class="btn btn-secondary" style="min-width: 150px;">Volver</a>
+        <div class="mb-3">
+            <label>Rol:</label>
+            <select name="rol" class="form-control" required>
+                <option value="admin">Administrador</option>
+                <option value="tecnico">Técnico</option>
+                <option value="usuario">Usuario</option>
+            </select>
+        </div>
+
+        <div class="botones-centrados">
+            <button type="submit" class="btn btn-success boton-accion">Registrar</button>
+            <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
         </div>
     </form>
 
-    <script src="../js/app.js" defer></script>
+</div>
+
+<!-- ASIDE -->
+<aside class="aside-estandar">
+    <h3>Acerca de Plataforma IT</h3>
+    <div class="botones-centrados" style="text-align: center;">
+        <p>Esta plataforma permite gestionar incidencias, tareas y dispositivos de manera eficiente.</p>
+        <p>Diseñada para facilitar el trabajo diario en entornos IT.</p>
+    </div>
+    <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
+
+    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h3>
+    <ul style="font-size: 21px;">
+        <li>Automatización de procesos IT</li>
+        <li>Integración con múltiples sistemas</li>
+        <li>Interfaz intuitiva y fácil de usar</li>
+    </ul>
+</aside>
+</div>
+
+</div> <!-- Cierre del div principal abierto en header.php -->
+
+<footer class="mt-5 text-white py-4">
+  <div class="container text-center" style="margin-top: 10px;">
+    <p class="mb-2" style="font-size: 1.5rem;">&copy; 2025 Plataforma IT. Todos los derechos reservados.</p>
+    <p class="mb-0" style="font-size: 1.4rem;">Desarrollado por <strong>Jorge Juncá López</strong> | Proyecto ASIR</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Tiempo de inactividad antes de la expiración (en segundos)
+const tiempoLimite = 900; // 15 minutos
+const avisoAntes = 60;
+
+let contador = tiempoLimite;
+
+const alerta = document.createElement("div");
+alerta.textContent = "⚠️ Tu sesión está a punto de expirar por inactividad.";
+alerta.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #004085;
+    color: black;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    font-weight: bold;
+    display: none;
+    z-index: 9999;
+`;
+document.body.appendChild(alerta);
+
+const intervalo = setInterval(() => {
+    contador--;
+
+    if (contador === avisoAntes) {
+        alerta.style.display = 'block';
+    }
+
+    if (contador <= 0) {
+        clearInterval(intervalo);
+        window.location.href = '/proyecto/index.php?expirado=1';
+    }
+}, 1000);
+
+['mousemove', 'keydown', 'click', 'scroll'].forEach(evento => {
+    document.addEventListener(evento, () => {
+        contador = tiempoLimite;
+        alerta.style.display = 'none';
+    });
+});
+</script>
+
 </body>
 </html>
-
-<?php include '../includes/footer.php'; ?>
-
-

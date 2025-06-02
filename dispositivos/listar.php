@@ -6,36 +6,86 @@ include '../includes/auth.php';
 include '../includes/header.php';
 
 echo "<style>
-    h2 {
-        font-size: 3rem;
-        font-weight: 900;
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF;
     }
+
+    .contenido-flex {
+        display: flex;
+        align-items: flex-start;
+        gap: 30px;
+    }
+
+    .panel-container {
+        flex: 1;
+    }
+
+    .aside-estandar {
+        width: 300px;
+        max-width: 100%;
+        flex-shrink: 0;
+        background-color: #f9f9f9;
+        padding: 20px;
+        font-size: 25px;
+        border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .titulos {
+        text-align: center;
+        font-size: 3.5em;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
     .table-wrapper {
         overflow-x: auto;
         max-width: 100%;
         margin-top: 20px;
     }
+
     .table-accesos {
-        font-size: 1em;
-	padding: 0px;
-        min-width: 700px;
+        width: 100%;
         border-collapse: collapse;
+        font-size: 1.3em;
+        margin-top: 10px;
     }
-    .table-accesos th {
-        background-color: #004085;
-        color: white;
-        padding: 0px;
-        text-align: left;
+
+    .table-accesos th, .table-accesos td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ccc;
     }
-    .table-accesos td {
-        padding: 5px;
-        border: 1px solid #ccc;
-    }
+
     .table-accesos tr:nth-child(even) {
         background-color: #d6e9f9;
     }
-    .btn {
-        font-size: 1.1rem;
+
+    .botones-centrados {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-top: 30px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+    }
+
+    .boton-accion {
+        min-width: 180px;
+        font-weight: bold;
     }
 </style>";
 
@@ -50,21 +100,19 @@ include '../conexion.php';
 
 <div class="contenido-flex">
     <div class="panel-container">
-        <h2>Listado de Dispositivos</h2>
+        <h2 class="titulos">Listado de Dispositivos</h2>
 
         <?php
-        // Eliminar dispositivo (solo admin o técnico)
         if (
             isset($_GET['eliminar']) &&
             ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico')
         ) {
             $id = intval($_GET['eliminar']);
             $conexion->query("DELETE FROM dispositivos WHERE id = $id");
-            echo "<p class='text-success'>Dispositivo eliminado correctamente.</p>";
+            echo "<div class='alert alert-success'>Dispositivo eliminado correctamente.</div>";
         }
 
-        // Obtener dispositivos
-        $sql = "SELECT dispositivos.id, dispositivos.nombre AS dispositivo_nombre, dispositivos.ip, dispositivos.tipo, dispositivos.estado, usuarios.nombre AS responsable 
+        $sql = "SELECT dispositivos.id, dispositivos.nombre AS dispositivo_nombre, dispositivos.ip, dispositivos.tipo, dispositivos.estado, usuarios.nombre AS responsable
                 FROM dispositivos
                 LEFT JOIN usuarios ON dispositivos.responsable = usuarios.id";
         $resultado = $conexion->query($sql);
@@ -89,8 +137,10 @@ include '../conexion.php';
                         <td><?= htmlspecialchars($row['responsable'] ?? '') ?></td>
                         <td>
                             <?php if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico'): ?>
-                                <a href='editar.php?id=<?= $row['id'] ?>' class='btn btn-warning btn-sm' style="background-color: #0d6efd; border: none; color: white;";>Editar</a>
-                                <a href='listar.php?eliminar=<?= $row['id'] ?>' class='btn btn-danger btn-sm'>Eliminar</a>
+                                <div style="display: flex; gap: 10px; justify-content: center;">
+                                    <a href='editar.php?id=<?= $row['id'] ?>' class='btn btn-primary' style="font-weight: bold; margin: auto;">Editar</a>
+                                    <a href='listar.php?eliminar=<?= $row['id'] ?>' class='btn btn-danger' style="font-weight: bold;">Eliminar</a>
+                                </div>
                             <?php else: ?>
                                 <span class="text-muted">Sin permiso</span>
                             <?php endif; ?>
@@ -100,15 +150,15 @@ include '../conexion.php';
             </table>
         </div>
 
-        <?php if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico'): ?>
-            <a href='agregar.php' class='btn btn-success mt-3'>Agregar nuevo dispositivo</a>
-        <?php endif; ?>
-
-        <br>
-        <a href='../panel.php' class='btn btn-secondary mt-3' style="width: 100px;">Volver</a>
+        <div class="botones-centrados">
+            <?php if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico'): ?>
+                <a href='agregar.php' class='btn btn-success boton-accion' style='font-size:1.2em;'>Agregar nuevo dispositivo</a>
+            <?php endif; ?>
+            <a href='../panel.php' class='btn btn-secondary boton-accion' style='font-size:1.2em;'>Volver al panel</a>
+        </div>
     </div>
 
-<?php include_once __DIR__ . '/../includes/aside.php'; ?>
+    <?php include_once __DIR__ . '/../includes/aside.php'; ?>
 </div>
 
 <?php include '../includes/footer.php'; ?>

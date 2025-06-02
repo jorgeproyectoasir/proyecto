@@ -30,40 +30,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: listar.php?creada=1");
         exit();
     } else {
-        $error = "Rellena todos los campos obligatorios.";
+        $error = "❌ Rellena todos los campos obligatorios.";
     }
 }
 ?>
 
 <?php include '../includes/header.php'; ?>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF; /* Fondo azul claro global */
+    }
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+</style>
+
 <div class="container mt-4">
-    <h2>Crear nueva tarea</h2>
+    <h2 class="titulos">Crear nueva tarea</h2>
 
     <?php if (!empty($error)): ?>
-        <div class="alert alert-danger mt-3">
-            <?= htmlspecialchars($error) ?>
-        </div>
+        <div class="alert alert-danger text-center"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
 
-    <form method="POST" class="mt-4 p-4 border rounded bg-light">
+    <form method="POST" class="mx-auto bg-light p-4 border rounded" style="max-width: 600px; width: 100%;">
         <div class="mb-3">
             <label for="titulo" class="form-label">Título:</label>
-            <input type="text" id="titulo" name="titulo" class="form-control" required>
+            <input type="text" id="titulo" name="titulo" class="form-control w-100" required>
         </div>
 
         <div class="mb-3">
             <label for="descripcion" class="form-label">Descripción:</label>
-            <textarea id="descripcion" name="descripcion" class="form-control" rows="4"></textarea>
+            <textarea id="descripcion" name="descripcion" class="form-control w-100" rows="4"></textarea>
         </div>
 
         <div class="mb-3">
             <label for="programada_para" class="form-label">Programada para:</label>
-            <input type="date" id="programada_para" name="programada_para" class="form-control" required>
+            <input type="date" id="programada_para" name="programada_para" class="form-control w-100" required>
         </div>
 
         <div class="mb-4">
             <label for="tecnico_id" class="form-label">Asignar a técnico:</label>
-            <select id="tecnico_id" name="tecnico_id" class="form-control" required>
+            <select id="tecnico_id" name="tecnico_id" class="form-select w-100" required>
                 <option value="">-- Selecciona técnico --</option>
                 <?php while ($tec = $tecnicos->fetch_assoc()): ?>
                     <option value="<?= $tec['id'] ?>"><?= htmlspecialchars($tec['nombre']) ?></option>
@@ -71,12 +86,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </select>
         </div>
 
-        <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-primary">Crear tarea</button>
-            <a href="listar.php" class="btn btn-secondary">Volver</a>
+        <div class="botones-centrados">
+            <button type="submit" class="btn btn-success" style='font-weight:bold'>Crear tarea</button>
+            <a href="listar.php" class="btn btn-secondary" style='font-weight:bold'>Volver</a>
         </div>
     </form>
 </div>
-<?php include '../includes/footer.php'; ?>
 
+<?php include '../includes/footer.php'; ?>
 

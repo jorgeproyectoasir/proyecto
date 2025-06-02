@@ -11,6 +11,51 @@ $_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
 $_SESSION['navegador'] = $_SERVER['HTTP_USER_AGENT'];
 
 include 'includes/header.php';
+  echo "<style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #B0D0FF;
+    }
+
+    .alert {
+      margin: 10px auto;
+      width: fit-content;
+      padding: 10px 20px;
+      background-color: #ffe6e6;
+      color: #b30000;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .botones-centrados {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: nowrap;
+    }
+
+    .boton-login {
+      width: 140px;
+      font-family: Arial, sans-serif;
+      font-weight: bold !important;
+      white-space: nowrap;
+      padding: 10px 0;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    #togglePassword {
+      color: #fff;
+      background-color: #6c757d;
+      border: none;
+    }
+
+    #togglePassword:hover {
+      background-color: #5a6268;
+    }
+  </style>";
 ?>
 
 <?php if (isset($_SESSION['flash'])): ?>
@@ -48,10 +93,12 @@ include 'includes/header.php';
     </div>
 
     <!-- Contenedor para los botones -->
-    <div class="button-container">
-        <button type="button" id="togglePassword" class="btn btn-secondary mt-4">Mostrar</button>
-        <button type="submit" class="btn btn-primary mb-3">Iniciar sesión</button>
-    </div>
+<div class="botones-centrados">
+          <button type="button" id="togglePassword" class="btn btn-secondary boton-login">
+            <span id="toggleIcon" class="bi bi-eye"></span><span class="texto"> Mostrar</span>
+          </button>
+          <button type="submit" class="btn btn-primary boton-login">Iniciar sesión</button>
+        </div>
 </form>
     </div>
 </div>

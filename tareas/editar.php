@@ -42,7 +42,7 @@ if ($nivel_usuario == 1) {
 }
 
 if (!$puede_editar) {
-    echo "No tienes permisos para editar esta tarea.";
+    echo "<div class='container mt-4 alert alert-danger'>No tienes permisos para editar esta tarea.</div>";
     include '../includes/footer.php';
     exit();
 }
@@ -64,7 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         registrar_log($conexion, $_SESSION["usuario_id"], "Editó tarea ID $id: '$titulo'");
 
-        // Redirigir con mensaje de éxito
         header("Location: listar.php?editada=1");
         exit();
     } else {
@@ -74,37 +73,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 
 <?php include '../includes/header.php'; ?>
-<h2>Editar tarea</h2>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF; /* Fondo azul claro global */
+    }
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+</style>
 
-<?php if (!empty($mensaje)): ?>
-    <div class="alert alert-danger mt-3">
-        <?= htmlspecialchars($mensaje) ?>
-    </div>
-<?php endif; ?>
+<div class="container mt-4">
+    <h2 class="titulos">Editar tarea</h2>
 
-<form method="POST" class="form-bordered mt-3">
-    <label>Título:</label><br>
-    <input type="text" name="titulo" value="<?= htmlspecialchars($tarea['titulo']) ?>" required><br><br>
+    <?php if (!empty($mensaje)): ?>
+        <div class="alert alert-danger text-center"><?= htmlspecialchars($mensaje) ?></div>
+    <?php endif; ?>
 
-    <label>Descripción:</label><br>
-    <textarea name="descripcion"><?= htmlspecialchars($tarea['descripcion']) ?></textarea><br><br>
+    <form method="POST" class="mx-auto bg-light p-4 border rounded" style="max-width: 600px; width: 100%;">
+        <div class="mb-3">
+            <label for="titulo" class="form-label">Título:</label>
+            <input type="text" id="titulo" name="titulo" value="<?= htmlspecialchars($tarea['titulo']) ?>" class="form-control w-100" required>
+        </div>
 
-    <label>Programada para:</label><br>
-    <input type="date" name="programada_para" value="<?= htmlspecialchars($tarea['programada_para']) ?>" required><br><br>
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" class="form-control w-100" rows="4"><?= htmlspecialchars($tarea['descripcion']) ?></textarea>
+        </div>
 
-    <label>Asignar a técnico:</label><br>
-    <select name="tecnico_id" required>
-        <option value="">-- Selecciona técnico --</option>
-        <?php while ($tec = $tecnicos->fetch_assoc()): ?>
-            <option value="<?= $tec['id'] ?>" <?= $tec['id'] == $tarea['tecnico_id'] ? 'selected' : '' ?>>
-                <?= htmlspecialchars($tec['nombre']) ?>
-            </option>
-        <?php endwhile; ?>
-    </select><br><br>
+        <div class="mb-3">
+            <label for="programada_para" class="form-label">Programada para:</label>
+            <input type="date" id="programada_para" name="programada_para" value="<?= htmlspecialchars($tarea['programada_para']) ?>" class="form-control w-100" required>
+        </div>
 
-    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-    <a href="listar.php" class="btn btn-secondary ms-2">Cancelar</a>
-</form>
+        <div class="mb-4">
+            <label for="tecnico_id" class="form-label">Asignar a técnico:</label>
+            <select id="tecnico_id" name="tecnico_id" class="form-select w-100" required>
+                <option value="">-- Selecciona técnico --</option>
+                <?php while ($tec = $tecnicos->fetch_assoc()): ?>
+                    <option value="<?= $tec['id'] ?>" <?= $tec['id'] == $tarea['tecnico_id'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($tec['nombre']) ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+
+        <div class="botones-centrados">
+            <button type="submit" class="btn btn-success" style='font-weight:bold'>Guardar cambios</button>
+            <a href="listar.php" class="btn btn-secondary" style='font-weight:bold'>Cancelar</a>
+        </div>
+    </form>
+</div>
 
 <?php include '../includes/footer.php'; ?>
 

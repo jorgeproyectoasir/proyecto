@@ -23,21 +23,24 @@
   if (session_status() === PHP_SESSION_NONE) {
       session_start();
   }
-  $usuario_nombre = $_SESSION['nombre'] ?? 'Invitado';
+  $usuario_nombre = $_SESSION['nombre'] ?? null;
+  $usuario_rol = $_SESSION['rol'] ?? null;
   $fecha_actual  = date('d/m/Y H:i');
 ?>
 
 <header>
-  <div class="header-container d-flex justify-content-between align-items-center">
-      <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px; margin-left: -50px;">Plataforma IT</h1>
-      <div class="text-end fs-5">
-        <div><strong>Usuario:</strong> <?= htmlspecialchars($usuario_nombre) ?></div>
-        <div><strong>Rol:</strong> <?= $_SESSION['rol']; ?></div>
-	<div><strong>Fecha:</strong> <?= $fecha_actual ?></div>
-      </div>
+  <div class="header-container d-flex justify-content-between align-items-center px-4">
+    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
+
+    <?php if ($usuario_nombre && $usuario_rol): ?>
+    <div class="text-end fs-5">
+      <div><strong>Usuario:</strong> <?= htmlspecialchars($usuario_nombre) ?></div>
+      <div><strong>Rol:</strong> <?= htmlspecialchars($usuario_rol) ?></div>
+      <div><strong>Fecha:</strong> <?= $fecha_actual ?></div>
+    </div>
+    <?php endif; ?>
   </div>
 </header>
-
 
 <!-- === CONTENIDO PRINCIPAL === -->
 <div class="w-100 px-4 mt-4">

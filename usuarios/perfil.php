@@ -48,15 +48,107 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
+<style>
+/* Estilo inspirado en usuarios/registro.php */
+body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF;
+        font-family: Arial, sans-serif;
+    }
+.formulario {
+    max-width: 450px;
+    margin: 0 auto;
+    background-color: #fefefe;
+    padding: 25px 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.formulario label {
+    font-weight: 600;
+    margin-top: 15px;
+    display: block;
+    color: #333;
+}
+
+.formulario .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 6px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.formulario .form-control:focus {
+    border-color: #004085;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 64, 133, 0.5);
+}
+
+.btn {
+    background-color: #198754;
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #136643;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #565e64;
+}
+
+.flex-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert {
+    max-width: 450px;
+    margin: 20px auto 0;
+    padding: 15px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+</style>
+
 <div class="contenido-flex">
     <div class="panel-container">
-        <h2>Mi Perfil</h2>
 
         <?php if ($mensaje): ?>
-            <div class="alert alert-<?= $tipo_mensaje ?> mt-3"><?= htmlspecialchars($mensaje) ?></div>
+            <div class="alert alert-<?= $tipo_mensaje === 'success' ? 'success' : 'danger' ?>"><?= htmlspecialchars($mensaje) ?></div>
         <?php endif; ?>
 
-        <form method="POST" class="formulario ancho-medio">
+        <form method="POST" class="formulario" novalidate>
+		<h2>Mi Perfil</h2>
             <label for="nombre">Nombre:</label>
             <input type="text" name="nombre" id="nombre" class="form-control" value="<?= htmlspecialchars($nombre_actual) ?>" required>
 
@@ -64,14 +156,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="email" name="email" id="email" class="form-control" value="<?= htmlspecialchars($email_actual) ?>" required>
 
             <label for="password">Nueva contraseña (opcional):</label>
-            <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="flex-row">
                 <input type="password" name="password" id="password" class="form-control">
-                <button type="button" id="togglePassword" class="btn btn-outline-secondary btn-sm">Mostrar</button>
+                <button type="button" id="togglePassword" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">Mostrar</button>
             </div>
 
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                <a href="../panel.php" class="btn btn-secondary">Volver</a>
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button type="submit" class="btn">Guardar cambios</button>
+                <a href="../panel.php" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Volver</a>
             </div>
         </form>
     </div>

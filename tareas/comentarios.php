@@ -1,6 +1,23 @@
 <?php
 include '../includes/auth.php';
 include '../includes/header.php';
+echo "<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF; /* Fondo azul claro global */
+    }
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+</style>";
+
 require_once '../includes/log.php';
 include '../conexion.php';
 
@@ -60,7 +77,7 @@ $stmt->execute();
 $comentarios = $stmt->get_result();
 ?>
 
-<h2>Comentarios de la tarea</h2>
+<h2 class="titulos">Comentarios de la tarea</h2>
 
 <div class="card mb-3">
     <div class="card-body">
@@ -81,9 +98,8 @@ $comentarios = $stmt->get_result();
     <div class="mb-3">
         <textarea name="mensaje" class="form-control" rows="4" required></textarea>
     </div>
-    <button type="submit" class="btn btn-primary">Enviar</button>
+    <button type="submit" class="btn btn-primary" style="font-weight: bold;">Enviar</button>
 </form>
-
 <hr>
 
 <h4>Historial de comentarios</h4>
@@ -98,7 +114,9 @@ $comentarios = $stmt->get_result();
     <p>No hay comentarios todavía.</p>
 <?php endif; ?>
 
-<a href="listar.php" class="btn btn-secondary mt-3">Volver al listado</a>
 
+<div style="text-align: center; margin-top: 20px;">
+    <a href="listar.php" class="btn btn-secondary" style="min-width: 180px; font-weight: bold;">Volver al listado</a>
+</div>
 <?php include '../includes/footer.php'; ?>
 
