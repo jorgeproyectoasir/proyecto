@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Plataforma IT</title>
-  <link rel="stylesheet" href="/css/estilo.css?v=1748867319">
+  <link rel="stylesheet" href="/css/estilo.css?v=1748854650">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="../js/app.js" defer></script>
-  <style>
+<style>
     body {
         margin: 0;
         padding: 0;
@@ -15,21 +15,19 @@
     }
 
     .titulos {
-        font-size: 60px !important;
-        margin-top: 40px !important;
         text-align: center;
         margin-top: 20px;
         font-size: 2em;
         color: #333;
     }
 
-    form {
+    .panel-container {
         max-width: 700px;
+        margin: 30px auto;
         background: #ffffff;
         border-radius: 12px;
         box-shadow: 0 0 15px rgba(0,0,0,0.1);
         padding: 30px;
-        box-sizing: border-box;
     }
 
     label {
@@ -45,11 +43,6 @@
         margin-bottom: 20px;
         border: 1px solid #ccc;
         border-radius: 6px;
-    }
-
-    textarea.form-control {
-        resize: vertical;
-        height: 120px;
     }
 
     .mb-3 {
@@ -82,127 +75,105 @@
         background-color: gray;
         color: white;
     }
+</style>
 
-    /* Contenedor flex para formulario + aside */
-    .contenido-flex {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      max-width: 1200px;
-      margin: 30px auto 60px auto;
-      padding: 0 15px;
-      box-sizing: border-box;
-      align-items: flex-start;
-    }
-
-    /* Aside con estilo unificado */
-    aside.aside-estandar {
-      width: 380px;
-      background-color: #f9f9f9;
-      padding: 25px 30px;
-      font-size: 21px;
-      border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-left: 3px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    aside.aside-estandar h3 {
-      margin-top: 0;
-      margin-bottom: 15px;
-      font-weight: 700;
-      font-size: 1.8rem;
-      color: #333;
-    }
-
-    aside.aside-estandar ul {
-      padding-left: 20px;
-    }
-
-    aside.aside-estandar ul li {
-      margin-bottom: 10px;
-      line-height: 1.3;
-    }
-
-    aside.aside-estandar img {
-      width: 100%;
-      margin-top: 20px;
-      border-radius: 12px;
-      object-fit: cover;
-    }
-  </style>
 </head>
 <body>
 
 <header>
   <div class="header-container d-flex justify-content-between align-items-center px-4">
     <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
-
     <div class="text-end fs-5">
       <div><strong>Usuario:</strong> Jorge Admin</div>
       <div><strong>Rol:</strong> admin</div>
-      <div><strong>Fecha:</strong> 02/06/2025 14:28</div>
+      <div><strong>Fecha:</strong> 02/06/2025 10:57</div>
     </div>
   </div>
 </header>
 
 <!-- === CONTENIDO PRINCIPAL === -->
 <div class="w-100 px-4 mt-4">
+<!-- ✅ FORMULARIO REGISTRO -->
+<div class="contenido-flex">
+<div class="panel-container">
 
-  <h2 class="titulos">Crear nueva incidencia</h2>
+    <h2 class="titulos">Crear nueva incidencia</h2>
 
-  <div class="contenido-flex">
-
-    <form method="POST" novalidate>
+    <form method="POST" action="procesar_registro.php">
         <div class="mb-3">
-            <label for="descripcion">Descripción:</label>
-            <textarea id="descripcion" name="descripcion" class="form-control" required></textarea>
+            <label>Descripcion:</label>
+            <input type="text" name="descripcion" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label for="tipo">Tipo:</label>
-            <select id="tipo" name="tipo" class="form-control" required>
-                <option value="error">Error</option>
-                <option value="mantenimiento">Mantenimiento</option>
+            <label>Estado:</label>
+		 <select name="rol" class="form-control" required>
+			<option value="abierta">Abierta</option> 
+			<option value="cerrada">Cerrada</option>
+		</select>
+        </div>
+
+        <div class="mb-3">
+            <label>Dispositivo:</label>
+	    <select name="dispositivo" class="form-control" required>
+		<option value="terminal telefonica">Terminal Telefonica</option>
+		<option value="servidor">Servidor</option>
+		<option value="red">Red</option>
+		<option value="ordenador">Ordenador</option>
+		<option value="periferico">Periferico</option>
+		<option value="almacenaniento">Almacenamiento</option>
+		<option value="router">Router</option>
+		<option value="dasdsadsada">dasdsadsada</option>
+		<option value="tablet">Tablet</option>
+	    </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Tipo:</label>
+            <select name="rol" class="form-control" required>
+		<option value="error">Error</option>
                 <option value="aviso">Aviso</option>
+                <option value="mantenimiento">Mantenimiento</option>
             </select>
         </div>
-
-        <div class="mb-3">
-            <label for="dispositivo">Dispositivo afectado:</label>
-            <select id="dispositivo" name="dispositivo" class="form-control" required>
-                <option value="3">Teléfono Araña Reuniones</option>
-                <option value="24">Servidor Principal</option>
-                <option value="25">Router Central</option>
-                <option value="26">Portátil Juan Pérez</option>
-                <option value="27">Impresora Oficina</option>
-                <option value="28">NAS de Respaldo</option>
-                <option value="29">Router Soporteu</option>
-                <option value="39">sdadadsadsa</option>
-                <option value="40">prueba1 santiagojunca</option>
-            </select>
-        </div>
-
+	<div class="mb-3">
+		<label>Usuario:</label>
+		<select name="usuario" class="form-control" required>
+			<option value="ana">Ana</option>
+			<option value="hgvhfvhgfgh">hgvhfvhgfgh</option>
+			<option value="jorge">Jorge Admin</option>
+			<option value="Luca | BS">Luca | BS</option>
+			<option value="Luis Tecnico">Luis Tecnico</option>
+			<option value="Santiago Junca">Santiago Junca</option>
+		</select>
+	</div>
         <div class="botones-centrados">
-            <button type="submit" class="btn btn-success boton-accion">Guardar</button>
+            <button type="submit" class="btn btn-success boton-accion">Crear</button>
             <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
         </div>
     </form>
 
-    <aside class="aside-estandar">
-      <h3>Información de la incidencia</h3>
-      <p>Para crear una nueva incidencia, completa todos los campos con la información necesaria:</p>
-      <ul>
-        <li>Descripción detallada del problema o aviso.</li>
-        <li>Tipo de incidencia: error, mantenimiento o aviso.</li>
-        <li>Selecciona el dispositivo afectado para mejor seguimiento.</li>
-      </ul>
-      <img src="/img/incidencia.jpg" alt="Incidencia" />
-    </aside>
+</div>
 
-  </div>
+<!-- ASIDE -->
+<aside class="aside-estandar">
+    <h3>Acerca de Plataforma IT</h3>
+    <div class="botones-centrados" style="text-align: center;">
+        <p>Esta plataforma permite gestionar incidencias, tareas y dispositivos de manera eficiente.</p>
+        <p>Diseñada para facilitar el trabajo diario en entornos IT.</p>
+    </div>
+    <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
 
-</div> <!-- Cierre del div principal -->
+    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h3>
+    <ul style="font-size: 21px;">
+        <li>Automatización de procesos IT</li>
+        <li>Integración con múltiples sistemas</li>
+        <li>Interfaz intuitiva y fácil de usar</li>
+    </ul>
+</aside>
+</div>
+
+</div> <!-- Cierre del div principal abierto en header.php -->
 
 <footer class="mt-5 text-white py-4">
   <div class="container text-center" style="margin-top: 10px;">

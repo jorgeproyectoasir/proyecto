@@ -3,134 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <title>Plataforma IT</title>
-  <link rel="stylesheet" href="/css/estilo.css?v=1748867203">
+  <link rel="stylesheet" href="/css/estilo.css?v=1748854650">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="../js/app.js" defer></script>
-  <style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        background-color: #B0D0FF;
-    }
-    .titulos {
-        text-align: center;
-        font-size: 3.5em;
-        font-weight: bold;
-        margin-top: 20px;
-        margin-bottom: 25px;
-    }
-    .contenedor-form {
-        max-width: 600px;
-        background-color: white;
-        padding: 25px 30px;
-        border-radius: 20px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        font-size: 1.3em;
-        box-sizing: border-box;
-    }
-    label {
-        font-weight: 600;
-        margin-bottom: 5px;
-        display: block;
-    }
-    input[type=text], textarea, select {
-        width: 100%;
-        padding: 10px 12px;
-        margin-bottom: 20px;
-        border: 1.5px solid #ccc;
-        border-radius: 10px;
-        font-size: 1em;
-        transition: border-color 0.3s ease;
-    }
-    input[type=text]:focus, textarea:focus, select:focus {
-        border-color: #4a90e2;
-        outline: none;
-    }
-    .botones-centrados {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin-top: 10px;
-        flex-wrap: wrap;
-    }
-    .btn {
-        min-width: 180px;
-        font-weight: bold;
-        padding: 12px 0;
-        border-radius: 10px;
-        cursor: pointer;
-        border: none;
-        color: white;
-        text-decoration: none;
-        text-align: center;
-        display: inline-block;
-        user-select: none;
-        transition: background-color 0.3s ease;
-    }
-    .btn-success {
-        background-color: #28a745;
-    }
-    .btn-success:hover {
-        background-color: #218838;
-    }
-    .btn-secondary {
-        background-color: #6c757d;
-    }
-    .btn-secondary:hover {
-        background-color: #5a6268;
-    }
-    .alert {
-        margin: 10px auto 20px auto;
-        width: fit-content;
-        padding: 12px 25px;
-        background-color: #ffe6e6;
-        color: #b30000;
-        border-radius: 8px;
-        text-align: center;
-        font-weight: 600;
-        font-size: 1.1em;
-        max-width: 600px;
-    }
-
-    /* NUEVOS ESTILOS para contenedor flex que une formulario y aside */
-    .contenido-flex {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      max-width: 1120px;
-      margin: 0 auto 50px auto;
-      padding: 0 15px;
-      box-sizing: border-box;
-      align-items: flex-start;
-    }
-
-    /* Aside con el estilo unificado igual que en registro */
-    .aside-estandar {
-      width: 400px;
-      flex: 0 0 400px;
-      background-color: #f9f9f9;
-      padding: 20px;
-      font-size: 25px;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      border-left: 2px solid #ccc;
-      margin-left: 20px;
-      box-sizing: border-box;
-      /* NO display:flex para mantener el mismo estilo */
-    }
-
-  </style>
 </head>
 <body>
 
 <header>
   <div class="header-container d-flex justify-content-between align-items-center px-4">
     <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
-
     <div class="text-end fs-5">
       <div><strong>Usuario:</strong> Jorge Admin</div>
       <div><strong>Rol:</strong> admin</div>
-      <div><strong>Fecha:</strong> 02/06/2025 14:26</div>
+      <div><strong>Fecha:</strong> 02/06/2025 10:57</div>
     </div>
   </div>
 </header>
@@ -138,47 +23,144 @@
 <!-- === CONTENIDO PRINCIPAL === -->
 <div class="w-100 px-4 mt-4">
 
-  <h2 class="titulos">Agregar nuevo servicio</h2>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF;
+        font-family: Arial, sans-serif;
+    }
 
-  <div class="contenido-flex">
-    <div class="contenedor-form">
-      <form method="POST" action="">
-          <label for="nombre">Nombre del servicio:</label>
-          <input type="text" id="nombre" name="nombre" required>
+    .titulos {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 2em;
+        color: #333;
+    }
 
-          <label for="descripcion">Descripción:</label>
-          <textarea id="descripcion" name="descripcion" rows="4"></textarea>
+    .panel-container {
+        max-width: 700px;
+        margin: 30px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        padding: 30px;
+    }
 
-          <label for="tipo">Tipo:</label>
-          <input type="text" id="tipo" name="tipo" required placeholder="Ej: mantenimiento">
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 6px;
+    }
 
-          <label for="estado">Estado:</label>
-          <select id="estado" name="estado">
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-          </select>
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
 
-          <div class="botones-centrados">
-              <button type="submit" class="btn btn-success">Guardar</button>
-              <a href="listar.php" class="btn btn-secondary">Volver a la lista</a>
-          </div>
-      </form>
+    .mb-3 {
+        margin-bottom: 20px;
+    }
+
+    .botones-centrados {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .boton-accion {
+        min-width: 160px;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .btn-success {
+        background-color: #198754;
+        color: white;
+    }
+
+    .btn-secondary {
+        background-color: gray;
+        color: white;
+    }
+</style>
+
+<!-- ✅ FORMULARIO REGISTRO -->
+<div class="contenido-flex">
+<div class="panel-container">
+
+    <h2 class="titulos">Agregar nuevo dispositivo</h2>
+
+    <form method="POST" action="procesar_registro.php">
+	<div class="mb-3">
+            <label>Nombre:</label>
+            <input type="text" name="nombre" class="form-control" required>
+        </div>
+
+	<div class="mb-3">
+            <label>IP:</label>
+            <input type="number" name="ip" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Tipo:</label>
+            <input type="text" name="tipo" class="form-control" required>
+        </div>
+	
+	
+        <div class="mb-3">
+		<label>Responsable:</label>
+		<select name="o" class="form-control" required>
+                <option value="Jorge Admin">Jorge Admin</option>
+                <option value="Luis Tecnico"> Luis Técnico</option>
+                <option value="Ana">Ana Usuaria</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Estado:</label>
+            <select name="estado" class="form-control" required>
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo</option>
+                <option value="mantenimiento">Mantenimiento</option>
+            </select>
+        </div>
+        <div class="botones-centrados">
+            <button type="submit" class="btn btn-success boton-accion">Agregar</button>
+            <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
+        </div>
+    </form>
+
+</div>
+
+<!-- ASIDE -->
+<aside class="aside-estandar">
+    <h3>Acerca de Plataforma IT</h3>
+    <div class="botones-centrados" style="text-align: center;">
+        <p>Esta plataforma permite gestionar incidencias, tareas y dispositivos de manera eficiente.</p>
+        <p>Diseñada para facilitar el trabajo diario en entornos IT.</p>
     </div>
+    <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
 
-    <aside class="aside-estandar">
-      <h3>Información del servicio</h3>
-      <p>Completa los campos para agregar un nuevo servicio a la plataforma IT.</p>
-      <ul style="font-size: 21px;">
-        <li>Nombre identificativo del servicio</li>
-        <li>Descripción breve y clara</li>
-        <li>Tipo de servicio (por ejemplo, mantenimiento)</li>
-        <li>Estado actual del servicio</li>
-      </ul>
-      <img src="/img/aside.jpg" alt="Servicio" class="img-fluid" style="margin-top: 20px; border-radius: 12px;">
-    </aside>
-  </div>
+    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h3>
+    <ul style="font-size: 21px;">
+        <li>Automatización de procesos IT</li>
+        <li>Integración con múltiples sistemas</li>
+        <li>Interfaz intuitiva y fácil de usar</li>
+    </ul>
+</aside>
+</div>
 
-</div> <!-- Cierre del div principal -->
+</div> <!-- Cierre del div principal abierto en header.php -->
 
 <footer class="mt-5 text-white py-4">
   <div class="container text-center" style="margin-top: 10px;">

@@ -1,183 +1,209 @@
-<?php
-include '../includes/auth.php';
-include '../includes/header.php';
-include '../conexion.php';
 
-$mensaje = "";
-$tipo_mensaje = "success";
-$usuario_id = $_SESSION['usuario_id'];
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Plataforma IT</title>
+  <link rel="stylesheet" href="/css/estilo.css?v=1748939754">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="../js/app.js" defer></script>
+</head>
+<body>
 
-// Obtener datos actuales del usuario
-$stmt = $conexion->prepare("SELECT nombre, email FROM usuarios WHERE id = ?");
-$stmt->bind_param("i", $usuario_id);
-$stmt->execute();
-$stmt->bind_result($nombre_actual, $email_actual);
-$stmt->fetch();
-$stmt->close();
 
-// Procesar formulario
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nuevo_nombre = trim($_POST["nombre"]);
-    $nuevo_email = trim($_POST["email"]);
-    $nueva_contra = $_POST["password"];
+<header>
+  <div class="header-container d-flex justify-content-between align-items-center px-4">
+    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
 
-    if (!empty($nuevo_nombre) && !empty($nuevo_email)) {
-        $sql = "UPDATE usuarios SET nombre = ?, email = ?" . (!empty($nueva_contra) ? ", contraseña = ?" : "") . " WHERE id = ?";
-        $stmt = $conexion->prepare($sql);
+        <div class="text-end fs-5">
+      <div><strong>Usuario:</strong> Jorge Admin</div>
+      <div><strong>Rol:</strong> admin</div>
+      <div><strong>Fecha:</strong> 03/06/2025 10:35</div>
+    </div>
+      </div>
+</header>
 
-        if (!empty($nueva_contra)) {
-            $password_hash = password_hash($nueva_contra, PASSWORD_DEFAULT);
-            $stmt->bind_param("sssi", $nuevo_nombre, $nuevo_email, $password_hash, $usuario_id);
-        } else {
-            $stmt->bind_param("ssi", $nuevo_nombre, $nuevo_email, $usuario_id);
-        }
+<!-- === CONTENIDO PRINCIPAL === -->
+<div class="w-100 px-4 mt-4">
 
-        if ($stmt->execute()) {
-            $mensaje = "Perfil actualizado correctamente.";
-            $_SESSION['nombre'] = $nuevo_nombre;
-        } else {
-            $mensaje = "Error al actualizar.";
-            $tipo_mensaje = "danger";
-        }
 
-        $stmt->close();
-    } else {
-        $mensaje = "Nombre y correo no pueden estar vacíos.";
-        $tipo_mensaje = "danger";
-    }
-}
-?>
 
+<!-- ✅ ESTILO EMBEBIDO -->
 <style>
-/* Estilo inspirado en usuarios/registro.php */
-body {
+    body {
         margin: 0;
         padding: 0;
         background-color: #B0D0FF;
         font-family: Arial, sans-serif;
     }
-.formulario {
-    max-width: 450px;
-    margin: 0 auto;
-    background-color: #fefefe;
-    padding: 25px 30px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
 
-.formulario label {
-    font-weight: 600;
-    margin-top: 15px;
-    display: block;
-    color: #333;
-}
+    .titulos {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 2em;
+        color: #333;
+    }
 
-.formulario .form-control {
-    width: 100%;
-    padding: 10px 12px;
-    margin-top: 6px;
-    border: 1px solid #bbb;
-    border-radius: 6px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-}
+    .panel-container {
+        max-width: 700px;
+        margin: 30px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        padding: 30px;
+    }
 
-.formulario .form-control:focus {
-    border-color: #004085;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 64, 133, 0.5);
-}
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 6px;
+    }
 
-.btn {
-    background-color: #198754;
-    color: white;
-    font-weight: 600;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 6px;
-    margin-top: 20px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
 
-.btn:hover {
-    background-color: #136643;
-    color: white;
-}
+    .mb-3 {
+        margin-bottom: 20px;
+    }
 
-.btn-secondary {
-    background-color: #6c757d;
-}
+    .botones-centrados {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
 
-.btn-secondary:hover {
-    background-color: #565e64;
-}
+    .boton-accion {
+        min-width: 160px;
+        font-weight: bold;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
 
-.flex-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+    .btn-success {
+        background-color: #198754;
+        color: white;
+    }
 
-.alert {
-    max-width: 450px;
-    margin: 20px auto 0;
-    padding: 15px;
-    border-radius: 6px;
-    text-align: center;
-    font-weight: 600;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-}
+    .btn-secondary {
+        background-color: gray;
+        color: white;
+    }
 </style>
 
+<!-- ✅ FORMULARIO -->
 <div class="contenido-flex">
-    <div class="panel-container">
+<div class="panel-container">
 
-        <?php if ($mensaje): ?>
-            <div class="alert alert-<?= $tipo_mensaje === 'success' ? 'success' : 'danger' ?>"><?= htmlspecialchars($mensaje) ?></div>
-        <?php endif; ?>
+    <h2 class="titulos">Mi perfil</h2>
 
-        <form method="POST" class="formulario" novalidate>
-		<h2>Mi Perfil</h2>
-            <label for="nombre">Nombre:</label>
-            <input type="text" name="nombre" id="nombre" class="form-control" value="<?= htmlspecialchars($nombre_actual) ?>" required>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Nombre:</label>
+            <input type="text" name="nombre" class="form-control" value="Tu nombre" required>
+        </div>
 
-            <label for="email">Correo:</label>
-            <input type="email" name="email" id="email" class="form-control" value="<?= htmlspecialchars($email_actual) ?>" required>
+        <div class="mb-3">
+            <label>Correo:</label>
+            <input type="email" name="correo" class="form-control" value="Tu correo" required>
+        </div>
 
-            <label for="password">Nueva contraseña (opcional):</label>
-            <div class="flex-row">
-                <input type="password" name="password" id="password" class="form-control">
-                <button type="button" id="togglePassword" class="btn btn-secondary btn-sm" style="padding: 6px 12px;">Mostrar</button>
-            </div>
+        <div class="mb-3">
+            <label>Contraseña nueva:</label>
+		<input type="password" name="contraseña" class="form-control" value="Tu contraseña" required>
+		<input type="button" name="boton" class="form-control" value="Mostrar">
+            </select>
+        </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 25px;">
-                <button type="submit" class="btn">Guardar cambios</button>
-                <a href="../panel.php" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Volver</a>
-            </div>
-        </form>
-    </div>
 
-    <?php include_once '../includes/aside.php'; ?>
+        <div class="botones-centrados">
+            <button type="submit" class="btn btn-success boton-accion">Guardar cambios</button>
+            <a href="listar.php" class="btn btn-secondary boton-accion">Volver</a>
+        </div>
+    </form>
+
 </div>
+<aside class="aside-estandar">
+    <h3>Acerca de Plataforma IT</h3>
+    <div class="botones-centrados" style="text-align: center;">
+    <p>Esta plataforma permite gestionar incidencias, tareas y dispositivos de manera eficiente.</p>
+    <p>Diseñada para facilitar el trabajo diario en entornos IT.</p>
+    </div>
+    <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
+    
+    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h4>
+    <ul style="font-size: 21px;">
+        <li>Automatización de procesos IT</li>
+        <li>Integración con múltiples sistemas</li>
+        <li>Interfaz intuitiva y fácil de usar</li>
+    </ul>
+</aside>
+
+</div>
+</div> <!-- Cierre del div principal abierto en header.php -->
+
+<footer class="mt-5 text-white py-4">
+  <div class="container text-center" style="margin-top: 10px;">
+    <p class="mb-2" style="font-size: 1.5rem;">&copy; 2025 Plataforma IT. Todos los derechos reservados.</p>
+    <p class="mb-0" style="font-size: 1.4rem;">Desarrollado por <strong>Jorge Juncá López</strong> | Proyecto ASIR</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-document.getElementById("togglePassword").addEventListener("click", function () {
-    const passwordInput = document.getElementById("password");
-    const tipo = passwordInput.type === "password" ? "text" : "password";
-    passwordInput.type = tipo;
-    this.textContent = tipo === "password" ? "Mostrar" : "Ocultar";
+// Tiempo de inactividad antes de la expiración (en segundos)
+const tiempoLimite = 900; // 15 minutos
+const avisoAntes = 60;
+
+let contador = tiempoLimite;
+
+const alerta = document.createElement("div");
+alerta.textContent = "⚠️ Tu sesión está a punto de expirar por inactividad.";
+alerta.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #004085;
+    color: black;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    font-weight: bold;
+    display: none;
+    z-index: 9999;
+`;
+document.body.appendChild(alerta);
+
+const intervalo = setInterval(() => {
+    contador--;
+
+    if (contador === avisoAntes) {
+        alerta.style.display = 'block';
+    }
+
+    if (contador <= 0) {
+        clearInterval(intervalo);
+        window.location.href = '/proyecto/index.php?expirado=1';
+    }
+}, 1000);
+
+['mousemove', 'keydown', 'click', 'scroll'].forEach(evento => {
+    document.addEventListener(evento, () => {
+        contador = tiempoLimite;
+        alerta.style.display = 'none';
+    });
 });
 </script>
 
-<?php include '../includes/footer.php'; ?>
+</body>
+</html>
