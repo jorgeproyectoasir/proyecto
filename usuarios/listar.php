@@ -83,7 +83,7 @@ while ($row = $resultado->fetch_assoc()) {
 
     // Eliminar
     if ($_SESSION['rol'] === 'admin' && $row['id'] !== $_SESSION['usuario_id']) {
-        echo "<a href='listar.php?eliminar={$row['id']}' class='btn btn-danger  eliminar' style='font-weight: bold;' onclick=\"return confirm('¿Estás seguro de eliminar este usuario?');\">Eliminar</a>";
+	echo "<a href='listar.php?eliminar={$row['id']}' class='btn btn-danger eliminar' style='font-weight: bold;'>Eliminar</a>";
     }
 
     echo "</td></tr>";

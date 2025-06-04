@@ -1,34 +1,54 @@
+<?php
+include '../includes/auth.php';
+include '../includes/header.php';
+include '../conexion.php';
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Plataforma IT</title>
-  <link rel="stylesheet" href="/css/estilo.css?v=1748939754">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="../js/app.js" defer></script>
-</head>
-<body>
+$usuario_id = $_SESSION['usuario_id'] ?? null;
+if (!$usuario_id) {
+    echo "No has iniciado sesión.";
+    include '../includes/footer.php';
+    exit();
+}
 
+$mensaje = "";
+$color = "green";
 
-<header>
-  <div class="header-container d-flex justify-content-between align-items-center px-4">
-    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
+// Guardar cambios si se ha enviado el formulario
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $nombre = trim($_POST['nombre']);
+    $email = trim($_POST['email']);
+    $contrasena = trim($_POST['contraseña']);
 
-        <div class="text-end fs-5">
-      <div><strong>Usuario:</strong> Jorge Admin</div>
-      <div><strong>Rol:</strong> admin</div>
-      <div><strong>Fecha:</strong> 03/06/2025 10:35</div>
-    </div>
-      </div>
-</header>
+    // Hash de la contraseña solo si se modifica
+    if (!empty($contrasena)) {
+        $contrasena_hashed = password_hash($contrasena, PASSWORD_DEFAULT);
+        $query = "UPDATE usuarios SET nombre=?, email=?, contraseña=? WHERE id=?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "sssi", $nombre, $email, $contrasena_hashed, $usuario_id);
+    } else {
+        $query = "UPDATE usuarios SET nombre=?, email=? WHERE id=?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, "ssi", $nombre, $email, $usuario_id);
+    }
 
-<!-- === CONTENIDO PRINCIPAL === -->
-<div class="w-100 px-4 mt-4">
+    if (mysqli_stmt_execute($stmt)) {
+        $mensaje = "✅ Perfil actualizado correctamente.";
+        $color = "green";
+    } else {
+        $mensaje = "❌ Error al actualizar el perfil.";
+        $color = "red";
+    }
+}
 
+// Obtener datos actualizados del usuario
+$query = "SELECT nombre, email FROM usuarios WHERE id = ?";
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "i", $usuario_id);
+mysqli_stmt_execute($stmt);
+$resultado = mysqli_stmt_get_result($stmt);
+$usuario = mysqli_fetch_assoc($resultado);
+?>
 
-
-<!-- ✅ ESTILO EMBEBIDO -->
 <style>
     body {
         margin: 0;
@@ -98,112 +118,56 @@
         background-color: gray;
         color: white;
     }
+
+    .mensaje {
+        text-align: center;
+        margin-top: 10px;
+        font-weight: bold;
+    }
 </style>
 
-<!-- ✅ FORMULARIO -->
 <div class="contenido-flex">
 <div class="panel-container">
 
     <h2 class="titulos">Mi perfil</h2>
 
+    <?php if ($mensaje): ?>
+        <div class="mensaje" style="color: <?= $color ?>"><?= htmlspecialchars($mensaje) ?></div>
+    <?php endif; ?>
+
     <form method="POST">
         <div class="mb-3">
             <label>Nombre:</label>
-            <input type="text" name="nombre" class="form-control" value="Tu nombre" required>
+            <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($usuario['nombre']) ?>" required>
         </div>
 
         <div class="mb-3">
             <label>Correo:</label>
-            <input type="email" name="correo" class="form-control" value="Tu correo" required>
+            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($usuario['email']) ?>" required>
         </div>
 
         <div class="mb-3">
-            <label>Contraseña nueva:</label>
-		<input type="password" name="contraseña" class="form-control" value="Tu contraseña" required>
-		<input type="button" name="boton" class="form-control" value="Mostrar">
-            </select>
+            <label>Nueva contraseña (opcional):</label>
+            <div class="input-group">
+                <input type="password" name="contraseña" id="campo-contrasena" class="form-control">
+                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">Mostrar</button>
+            </div>
         </div>
 
-
         <div class="botones-centrados">
-            <button type="submit" class="btn btn-success boton-accion">Guardar cambios</button>
-            <a href="listar.php" class="btn btn-secondary boton-accion">Volver</a>
+            <button type="submit" class="btn btn-success boton-accion">Actualizar</button>
+            <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
         </div>
     </form>
 
 </div>
-<aside class="aside-estandar">
-    <h3>Acerca de Plataforma IT</h3>
-    <div class="botones-centrados" style="text-align: center;">
-    <p>Esta plataforma permite gestionar incidencias, tareas y dispositivos de manera eficiente.</p>
-    <p>Diseñada para facilitar el trabajo diario en entornos IT.</p>
-    </div>
-    <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
-    
-    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h4>
-    <ul style="font-size: 21px;">
-        <li>Automatización de procesos IT</li>
-        <li>Integración con múltiples sistemas</li>
-        <li>Interfaz intuitiva y fácil de usar</li>
-    </ul>
-</aside>
-
+<?php include '../includes/aside.php'; ?>
 </div>
-</div> <!-- Cierre del div principal abierto en header.php -->
-
-<footer class="mt-5 text-white py-4">
-  <div class="container text-center" style="margin-top: 10px;">
-    <p class="mb-2" style="font-size: 1.5rem;">&copy; 2025 Plataforma IT. Todos los derechos reservados.</p>
-    <p class="mb-0" style="font-size: 1.4rem;">Desarrollado por <strong>Jorge Juncá López</strong> | Proyecto ASIR</p>
-  </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<?php include '../includes/footer.php'; ?>
 
 <script>
-// Tiempo de inactividad antes de la expiración (en segundos)
-const tiempoLimite = 900; // 15 minutos
-const avisoAntes = 60;
-
-let contador = tiempoLimite;
-
-const alerta = document.createElement("div");
-alerta.textContent = "⚠️ Tu sesión está a punto de expirar por inactividad.";
-alerta.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #004085;
-    color: black;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    font-weight: bold;
-    display: none;
-    z-index: 9999;
-`;
-document.body.appendChild(alerta);
-
-const intervalo = setInterval(() => {
-    contador--;
-
-    if (contador === avisoAntes) {
-        alerta.style.display = 'block';
+    function togglePassword() {
+        const campo = document.getElementById('campo-contrasena');
+        campo.type = campo.type === 'password' ? 'text' : 'password';
     }
-
-    if (contador <= 0) {
-        clearInterval(intervalo);
-        window.location.href = '/proyecto/index.php?expirado=1';
-    }
-}, 1000);
-
-['mousemove', 'keydown', 'click', 'scroll'].forEach(evento => {
-    document.addEventListener(evento, () => {
-        contador = tiempoLimite;
-        alerta.style.display = 'none';
-    });
-});
 </script>
-
-</body>
-</html>

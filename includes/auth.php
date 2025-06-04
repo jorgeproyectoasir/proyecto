@@ -1,4 +1,3 @@
-
 <?php
 // Solo aplicar configuración si la sesión no está activa
 if (session_status() === PHP_SESSION_NONE) {
@@ -13,15 +12,12 @@ if (session_status() === PHP_SESSION_NONE) {
         'httponly' => true,
         'samesite' => 'Strict'
     ]);
-
     session_start();
 }
-
 // -----------------------------
 // Expiración por inactividad
 // -----------------------------
 $tiempo_limite = 900; // 15 minutos
-
 if (isset($_SESSION['ultima_actividad']) && (time() - $_SESSION['ultima_actividad']) > $tiempo_limite) {
     session_unset();
     session_destroy();
@@ -30,7 +26,6 @@ if (isset($_SESSION['ultima_actividad']) && (time() - $_SESSION['ultima_activida
 }
 
 $_SESSION['ultima_actividad'] = time();
-
 // -----------------------------
 // Validación opcional: IP y navegador
 // -----------------------------
@@ -43,8 +38,6 @@ if (!isset($_SESSION['ip']) || $_SESSION['ip'] !== $_SERVER['REMOTE_ADDR'] ||
     header("Location: /proyecto/index.php");
     exit();
 }
-
-
 // -----------------------------
 // Redirección si no ha iniciado sesión
 // -----------------------------
@@ -52,4 +45,3 @@ if (!isset($_SESSION['usuario_id'])) {
     header("Location: /proyecto/index.php");
     exit();
 }
-

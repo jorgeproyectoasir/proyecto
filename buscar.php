@@ -1,196 +1,127 @@
+<?php
+require_once "conexion.php";
+require_once "includes/auth.php";
+require_once "includes/header.php";
+require_once "includes/aside.php";
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Plataforma IT</title>
-  <link rel="stylesheet" href="/css/estilo.css?v=1748944952">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="js/app.js" defer></script>
-</head>
-<body>
+$busqueda = isset($_GET['q']) ? trim($_GET['q']) : '';
+?>
 
+<main class="contenido">
+    <h1>Buscador Global</h1>
+    <form method="get" action="buscar.php" class="formulario-busqueda">
+        <input type="text" name="q" placeholder="Buscar en la plataforma..." value="<?= htmlspecialchars($busqueda) ?>" required>
+        <button type="submit">Buscar</button>
+    </form>
 
-<header>
-  <div class="header-container d-flex justify-content-between align-items-center px-4">
-    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
+<?php
+if (!empty($busqueda)) {
+    $like = '%' . $conn->real_escape_string($busqueda) . '%';
 
-        <div class="text-end fs-5">
-      <div><strong>Usuario:</strong> Jorge Admin</div>
-      <div><strong>Rol:</strong> admin</div>
-      <div><strong>Fecha:</strong> 03/06/2025 12:02</div>
-    </div>
-      </div>
-</header>
+    echo "<h2>Resultados para: <em>" . htmlspecialchars($busqueda) . "</em></h2>";
 
-<!-- === CONTENIDO PRINCIPAL === -->
-<div class="w-100 px-4 mt-4">
-
-
-
-<style>
-  body, html {
-    margin: 0;
-    padding: 0;
-    background-color: #B0D0FF;
-    font-family: Arial, sans-serif;
-  }
-
-  /* Contenedor principal centrado y con ancho máximo */
-  .panel-container {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 30px;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    border-radius: 8px;
-  }
-
-  .titulos {
-    color: #004085;
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-
-  .formulario {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .form-control {
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .btn {
-    cursor: pointer;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-weight: bold;
-    border-radius: 4px;
-    margin-top: 10px;
-    align-self: flex-start;
-  }
-
-  .btn:hover {
-    background-color: #6c757d;
-    color: white;
-  }
-
-  ul.list-group {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 0.5rem;
-  }
-
-  ul.list-group li {
-    background-color: #e9ecef;
-    margin-bottom: 0.3rem;
-    padding: 10px;
-    border-radius: 4px;
-  }
-
-  ul.list-group li a {
-    color: #004085;
-    text-decoration: none;
-  }
-
-  ul.list-group li a:hover {
-    text-decoration: underline;
-  }
-
-  .alert {
-    margin: 10px auto;
-    width: fit-content;
-    padding: 10px 20px;
-    background-color: #ffe6e6;
-    color: #b30000;
-    border-radius: 6px;
-    text-align: center;
-  }
-
-  .botones-centrados {
-    text-align: center;
-  }
-</style>
-
-<div class="panel-container">
-  <h2 class="titulos">Buscador global</h2>
-  <p style="font-size: 2em;">Introduce una palabra o término para buscar en incidencias, dispositivos, servicios, tareas y, si tienes permisos, también en usuarios.</p>
-
-  <form method="GET" action="" class="formulario">
-    <input type="text" name="q" class="form-control" style="font-size:2em;" placeholder="Buscar por descripción, nombre, correo, etc." value="" required>
-    <button type="submit" class="btn" style="background-color: #198754;">Buscar</button>
-  </form>
-
-      <p class="mt-3" style="font-size: 2em;">Usa el formulario para buscar en el sistema.</p>
-  
-  <div class="botones-centrados">
-    <a href="panel.php" class="btn btn-secondary" style="font-weight:bold;">Volver al panel</a>
-  </div>
-</div>
-
-</div> <!-- Cierre del div principal abierto en header.php -->
-
-<footer class="mt-5 text-white py-4">
-  <div class="container text-center" style="margin-top: 10px;">
-    <p class="mb-2" style="font-size: 1.5rem;">&copy; 2025 Plataforma IT. Todos los derechos reservados.</p>
-    <p class="mb-0" style="font-size: 1.4rem;">Desarrollado por <strong>Jorge Juncá López</strong> | Proyecto ASIR</p>
-  </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-// Tiempo de inactividad antes de la expiración (en segundos)
-const tiempoLimite = 900; // 15 minutos
-const avisoAntes = 60;
-
-let contador = tiempoLimite;
-
-const alerta = document.createElement("div");
-alerta.textContent = "⚠️ Tu sesión está a punto de expirar por inactividad.";
-alerta.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #004085;
-    color: black;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    font-weight: bold;
-    display: none;
-    z-index: 9999;
-`;
-document.body.appendChild(alerta);
-
-const intervalo = setInterval(() => {
-    contador--;
-
-    if (contador === avisoAntes) {
-        alerta.style.display = 'block';
+    // === TAREAS ===
+    $query = "SELECT * FROM tareas WHERE titulo LIKE ? OR descripcion LIKE ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ss", $like, $like);
+    $stmt->execute();
+    $tareas = $stmt->get_result();
+    if ($tareas->num_rows > 0) {
+        echo "<h3>Tareas</h3><ul>";
+        while ($row = $tareas->fetch_assoc()) {
+            echo "<li><strong>" . $row['titulo'] . "</strong> — " . $row['descripcion'] . "</li>";
+        }
+        echo "</ul>";
     }
 
-    if (contador <= 0) {
-        clearInterval(intervalo);
-        window.location.href = '/proyecto/index.php?expirado=1';
+    // === INCIDENCIAS ===
+    $query = "SELECT * FROM incidencias WHERE descripcion LIKE ? OR tipo LIKE ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ss", $like, $like);
+    $stmt->execute();
+    $incidencias = $stmt->get_result();
+    if ($incidencias->num_rows > 0) {
+        echo "<h3>Incidencias</h3><ul>";
+        while ($row = $incidencias->fetch_assoc()) {
+            echo "<li><strong>" . $row['tipo'] . "</strong>: " . $row['descripcion'] . "</li>";
+        }
+        echo "</ul>";
     }
-}, 1000);
 
-['mousemove', 'keydown', 'click', 'scroll'].forEach(evento => {
-    document.addEventListener(evento, () => {
-        contador = tiempoLimite;
-        alerta.style.display = 'none';
-    });
-});
-</script>
+    // === DISPOSITIVOS ===
+    $query = "SELECT * FROM dispositivos WHERE nombre LIKE ? OR ip LIKE ? OR tipo LIKE ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sss", $like, $like, $like);
+    $stmt->execute();
+    $dispositivos = $stmt->get_result();
+    if ($dispositivos->num_rows > 0) {
+        echo "<h3>Dispositivos</h3><ul>";
+        while ($row = $dispositivos->fetch_assoc()) {
+            echo "<li><strong>" . $row['nombre'] . "</strong> — " . $row['ip'] . " — " . $row['tipo'] . "</li>";
+        }
+        echo "</ul>";
+    }
 
-</body>
-</html>
+    // === SERVICIOS ===
+    $query = "SELECT * FROM servicios WHERE nombre LIKE ? OR tipo LIKE ? OR descripcion LIKE ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sss", $like, $like, $like);
+    $stmt->execute();
+    $servicios = $stmt->get_result();
+    if ($servicios->num_rows > 0) {
+        echo "<h3>Servicios</h3><ul>";
+        while ($row = $servicios->fetch_assoc()) {
+            echo "<li><strong>" . $row['nombre'] . "</strong> — " . $row['descripcion'] . "</li>";
+        }
+        echo "</ul>";
+    }
+
+    // === USUARIOS (solo si es admin) ===
+    if ($_SESSION['rol'] == 1) {
+        $query = "SELECT * FROM usuarios WHERE nombre LIKE ? OR email LIKE ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ss", $like, $like);
+        $stmt->execute();
+        $usuarios = $stmt->get_result();
+        if ($usuarios->num_rows > 0) {
+            echo "<h3>Usuarios</h3><ul>";
+            while ($row = $usuarios->fetch_assoc()) {
+                echo "<li><strong>" . $row['nombre'] . "</strong> — " . $row['email'] . "</li>";
+            }
+            echo "</ul>";
+        }
+    }
+
+    // === LOGS ===
+    $query = "SELECT * FROM logs WHERE accion LIKE ? OR entidad_afectada LIKE ? OR descripcion LIKE ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sss", $like, $like, $like);
+    $stmt->execute();
+    $logs = $stmt->get_result();
+    if ($logs->num_rows > 0) {
+        echo "<h3>Logs</h3><ul>";
+        while ($row = $logs->fetch_assoc()) {
+            echo "<li><strong>" . $row['accion'] . "</strong> — " . $row['descripcion'] . "</li>";
+        }
+        echo "</ul>";
+    }
+
+    // Si no se encontraron resultados
+    if (
+        $tareas->num_rows == 0 &&
+        $incidencias->num_rows == 0 &&
+        $dispositivos->num_rows == 0 &&
+        $servicios->num_rows == 0 &&
+        (!isset($usuarios) || $usuarios->num_rows == 0) &&
+        $logs->num_rows == 0
+    ) {
+        echo "<p>No se encontraron resultados para la búsqueda.</p>";
+    }
+
+    $stmt->close();
+}
+?>
+
+</main>
+
+<?php require_once "includes/footer.php"; ?>

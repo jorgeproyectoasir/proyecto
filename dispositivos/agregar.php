@@ -1,220 +1,107 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Plataforma IT</title>
-  <link rel="stylesheet" href="/css/estilo.css?v=1748854650">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="../js/app.js" defer></script>
-</head>
-<body>
+<?php
+session_start();
 
-<header>
-  <div class="header-container d-flex justify-content-between align-items-center px-4">
-    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
-    <div class="text-end fs-5">
-      <div><strong>Usuario:</strong> Jorge Admin</div>
-      <div><strong>Rol:</strong> admin</div>
-      <div><strong>Fecha:</strong> 02/06/2025 10:57</div>
-    </div>
-  </div>
-</header>
+require_once '../conexion.php';
+require_once '../includes/auth.php';
 
-<!-- === CONTENIDO PRINCIPAL === -->
-<div class="w-100 px-4 mt-4">
+$mensaje = "";
+$clase_alerta = "";
 
+$nombre = $ip = $estado = $tipo = "";
+$responsable = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nombre = trim($_POST['nombre'] ?? '');
+    $ip = trim($_POST['ip'] ?? '');
+    $estado = trim($_POST['estado'] ?? 'activo'); // valor por defecto
+    $tipo = trim($_POST['tipo'] ?? '');
+    $responsable = !empty($_POST['responsable']) ? intval($_POST['responsable']) : null;
+
+    if ($nombre === '') {
+        $mensaje = "El nombre es obligatorio.";
+        $clase_alerta = "alert alert-danger";
+    } else {
+        $sql = "INSERT INTO dispositivos (nombre, ip, estado, responsable, tipo) VALUES (?, ?, ?, ?, ?)";
+        if ($stmt = $conexion->prepare($sql)) {
+            // Como responsable puede ser NULL, bind_param no acepta directamente null,
+            // usamos un truco pasando NULL o valor
+            if ($responsable === null) {
+                $stmt->bind_param('sssis', $nombre, $ip, $estado, $nullVar, $tipo);
+                $nullVar = null;
+            } else {
+                $stmt->bind_param('sssis', $nombre, $ip, $estado, $responsable, $tipo);
+            }
+            if ($stmt->execute()) {
+                $mensaje = "Dispositivo agregado correctamente.";
+                $clase_alerta = "alert alert-success";
+                $nombre = $ip = $estado = $tipo = "";
+                $responsable = null;
+            } else {
+                $mensaje = "Error al agregar el dispositivo: " . htmlspecialchars($stmt->error);
+                $clase_alerta = "alert alert-danger";
+            }
+            $stmt->close();
+        } else {
+            $mensaje = "Error en la consulta: " . htmlspecialchars($conexion->error);
+            $clase_alerta = "alert alert-danger";
+        }
+    }
+}
+
+?>
+
+<?php include_once '../includes/header.php'; ?>
+<?php include_once '../includes/aside.php'; ?>
 <style>
-    body {
+ html, body {
         margin: 0;
         padding: 0;
         background-color: #B0D0FF;
-        font-family: Arial, sans-serif;
-    }
-
-    .titulos {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 2em;
-        color: #333;
-    }
-
-    .panel-container {
-        max-width: 700px;
-        margin: 30px auto;
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        padding: 30px;
-    }
-
-    label {
-        font-weight: bold;
-        display: block;
-        margin-bottom: 6px;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 10px;
-        font-size: 1em;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-    }
-
-    .mb-3 {
-        margin-bottom: 20px;
-    }
-
-    .botones-centrados {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-    }
-
-    .boton-accion {
-        min-width: 160px;
-        font-weight: bold;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .btn-success {
-        background-color: #198754;
-        color: white;
-    }
-
-    .btn-secondary {
-        background-color: gray;
-        color: white;
     }
 </style>
+<div class="container mt-4">
+    <h2>Agregar nuevo dispositivo</h2>
 
-<!-- ✅ FORMULARIO REGISTRO -->
-<div class="contenido-flex">
-<div class="panel-container">
-
-    <h2 class="titulos">Agregar nuevo dispositivo</h2>
-
-    <form method="POST" action="procesar_registro.php">
-	<div class="mb-3">
-            <label>Nombre:</label>
-            <input type="text" name="nombre" class="form-control" required>
+    <?php if ($mensaje): ?>
+        <div class="<?= $clase_alerta ?>" role="alert">
+            <?= $mensaje ?>
         </div>
+    <?php endif; ?>
 
-	<div class="mb-3">
-            <label>IP:</label>
-            <input type="number" name="ip" class="form-control" required>
+    <form method="post" action="">
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre *</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" required value="<?= htmlspecialchars($nombre) ?>">
         </div>
 
         <div class="mb-3">
-            <label>Tipo:</label>
-            <input type="text" name="tipo" class="form-control" required>
+            <label for="ip" class="form-label">IP</label>
+            <input type="text" name="ip" id="ip" class="form-control" value="<?= htmlspecialchars($ip) ?>">
         </div>
-	
-	
+
         <div class="mb-3">
-		<label>Responsable:</label>
-		<select name="o" class="form-control" required>
-                <option value="Jorge Admin">Jorge Admin</option>
-                <option value="Luis Tecnico"> Luis Técnico</option>
-                <option value="Ana">Ana Usuaria</option>
+            <label for="estado" class="form-label">Estado</label>
+            <select name="estado" id="estado" class="form-select">
+                <option value="activo" <?= $estado === 'activo' ? 'selected' : '' ?>>Activo</option>
+                <option value="inactivo" <?= $estado === 'inactivo' ? 'selected' : '' ?>>Inactivo</option>
+                <option value="mantenimiento" <?= $estado === 'mantenimiento' ? 'selected' : '' ?>>Mantenimiento</option>
             </select>
         </div>
 
         <div class="mb-3">
-            <label>Estado:</label>
-            <select name="estado" class="form-control" required>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-                <option value="mantenimiento">Mantenimiento</option>
-            </select>
+            <label for="responsable" class="form-label">Responsable (ID usuario)</label>
+            <input type="number" name="responsable" id="responsable" class="form-control" value="<?= htmlspecialchars($responsable) ?>">
         </div>
-        <div class="botones-centrados">
-            <button type="submit" class="btn btn-success boton-accion">Agregar</button>
-            <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
+
+        <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo</label>
+            <input type="text" name="tipo" id="tipo" class="form-control" value="<?= htmlspecialchars($tipo) ?>">
         </div>
+
+        <button type="submit" class="btn btn-primary">Agregar dispositivo</button>
+        <a href="listar.php" class="btn btn-secondary ms-2">Volver a la lista</a>
     </form>
-
 </div>
 
-<!-- ASIDE -->
-<aside class="aside-estandar">
-    <h3>Acerca de Plataforma IT</h3>
-    <div class="botones-centrados" style="text-align: center;">
-        <p>Esta plataforma permite gestionar incidencias, tareas y dispositivos de manera eficiente.</p>
-        <p>Diseñada para facilitar el trabajo diario en entornos IT.</p>
-    </div>
-    <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
+<?php include_once '../includes/footer.php'; ?>
 
-    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h3>
-    <ul style="font-size: 21px;">
-        <li>Automatización de procesos IT</li>
-        <li>Integración con múltiples sistemas</li>
-        <li>Interfaz intuitiva y fácil de usar</li>
-    </ul>
-</aside>
-</div>
-
-</div> <!-- Cierre del div principal abierto en header.php -->
-
-<footer class="mt-5 text-white py-4">
-  <div class="container text-center" style="margin-top: 10px;">
-    <p class="mb-2" style="font-size: 1.5rem;">&copy; 2025 Plataforma IT. Todos los derechos reservados.</p>
-    <p class="mb-0" style="font-size: 1.4rem;">Desarrollado por <strong>Jorge Juncá López</strong> | Proyecto ASIR</p>
-  </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-// Tiempo de inactividad antes de la expiración (en segundos)
-const tiempoLimite = 900; // 15 minutos
-const avisoAntes = 60;
-
-let contador = tiempoLimite;
-
-const alerta = document.createElement("div");
-alerta.textContent = "⚠️ Tu sesión está a punto de expirar por inactividad.";
-alerta.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #004085;
-    color: black;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    font-weight: bold;
-    display: none;
-    z-index: 9999;
-`;
-document.body.appendChild(alerta);
-
-const intervalo = setInterval(() => {
-    contador--;
-
-    if (contador === avisoAntes) {
-        alerta.style.display = 'block';
-    }
-
-    if (contador <= 0) {
-        clearInterval(intervalo);
-        window.location.href = '/proyecto/index.php?expirado=1';
-    }
-}, 1000);
-
-['mousemove', 'keydown', 'click', 'scroll'].forEach(evento => {
-    document.addEventListener(evento, () => {
-        contador = tiempoLimite;
-        alerta.style.display = 'none';
-    });
-});
-</script>
-
-</body>
-</html>

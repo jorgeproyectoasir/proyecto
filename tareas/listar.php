@@ -132,10 +132,10 @@ if ($rol === 'admin' || $rol === 'tecnico') {
                            style="background-color: #0dcaf0; color: white; font-weight: bold;">Comentarios</a>
 
                         <?php if ($fila['estado'] === 'completada' && $rol === 'admin'): ?>
-                            <a href="eliminar.php?id=<?= $fila['id'] ?>"
-                               class="btn btn-danger btn-sm eliminar"
-                               style="font-weight: bold;"
-                               onclick="return confirm('¿Estás seguro de eliminar esta tarea?');">Eliminar</a>
+			<a href="eliminar.php?id=<?= $fila['id'] ?>"
+			   class="btn btn-danger btn-sm eliminar"
+			   style="font-weight: bold;">Eliminar</a>
+
                         <?php endif; ?>
 
                         <?php if ($fila['estado'] === 'pendiente' && ($rol === 'admin' || $rol === 'tecnico')): ?>

@@ -6,7 +6,7 @@
     </div>
     <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
     
-    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h4>
+    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h3>
     <ul style="font-size: 21px;">
         <li>Automatización de procesos IT</li>
         <li>Integración con múltiples sistemas</li>

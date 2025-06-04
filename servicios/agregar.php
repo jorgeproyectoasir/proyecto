@@ -6,47 +6,35 @@ require_once '../includes/log.php';
 $mensaje = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nombre      = trim($_POST['nombre']);
     $descripcion = trim($_POST['descripcion']);
-    $estado      = $_POST['estado'] ?? 'activo';
-    $tipo        = trim($_POST['tipo']);
+    $estado = $_POST['estado'] ?? 'abierta';
+    $dispositivo_id = $_POST['dispositivo'];
+    $tipo = $_POST['tipo'];
+    $usuario_id = $_POST['usuario'];
 
-    if (empty($nombre)) {
-        $mensaje = "❌ El nombre es obligatorio.";
-    } elseif (empty($tipo)) {
-        $mensaje = "❌ El tipo es obligatorio.";
+    if (empty($descripcion)) {
+        $mensaje = "❌ La descripción es obligatoria.";
     } else {
         $stmt = $conexion->prepare(
-            "INSERT INTO servicios (nombre, descripcion, estado, tipo) VALUES (?, ?, ?, ?)"
+            "INSERT INTO incidencias (descripcion, estado, dispositivo_id, tipo, usuario_id) VALUES (?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param("ssss", $nombre, $descripcion, $estado, $tipo);
+        $stmt->bind_param("ssisi", $descripcion, $estado, $dispositivo_id, $tipo, $usuario_id);
         $stmt->execute();
 
-        registrar_log($conexion, $_SESSION["usuario_id"], "Agregó un nuevo servicio: $nombre");
-        header("Location: listar.php?msg=Servicio agregado correctamente.");
+        registrar_log($conexion, $_SESSION["usuario_id"], "Creó una nueva incidencia: $descripcion");
+        header("Location: listar.php?msg=Incidencia creada correctamente.");
         exit();
     }
 }
+
+// Obtener lista de dispositivos y usuarios para los select
+$dispositivos = $conexion->query("SELECT id, nombre FROM dispositivos");
+$usuarios = $conexion->query("SELECT id, nombre FROM usuarios");
 ?>
 
 <?php include '../includes/header.php'; ?>
 
-<!-- ✅ ESTILOS EMBEBIDOS -->
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: #B0D0FF;
-        font-family: Arial, sans-serif;
-    }
-
-    .titulos {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 2em;
-        color: #333;
-    }
-
     .panel-container {
         max-width: 700px;
         margin: 30px auto;
@@ -69,10 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         margin-bottom: 20px;
         border: 1px solid #ccc;
         border-radius: 6px;
-    }
-
-    .mb-3 {
-        margin-bottom: 20px;
     }
 
     .alert {
@@ -113,11 +97,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 </style>
 
-<!-- ✅ CONTENIDO -->
 <div class="contenido-flex">
 <div class="panel-container">
-
-    <h2 class="titulos text-center">Agregar Servicio</h2>
+    <h2 class="titulos text-center">Crear nueva incidencia</h2>
 
     <?php if (!empty($mensaje)): ?>
         <div class="alert"><?= htmlspecialchars($mensaje) ?></div>
@@ -125,35 +107,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <form method="POST">
         <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre del servicio:</label>
-            <input type="text" id="nombre" name="nombre" class="form-control" required>
+            <label class="form-label">Descripción:</label>
+            <input type="text" name="descripcion" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label for="descripcion" class="form-label">Descripción:</label>
-            <textarea id="descripcion" name="descripcion" class="form-control" rows="4"></textarea>
+            <label class="form-label">Estado:</label>
+            <select name="estado" class="form-select" required>
+                <option value="abierta">Abierta</option>
+                <option value="cerrada">Cerrada</option>
+            </select>
         </div>
 
         <div class="mb-3">
-            <label for="tipo" class="form-label">Tipo:</label>
-            <input type="text" id="tipo" name="tipo" class="form-control" required placeholder="Ej: mantenimiento">
+            <label class="form-label">Dispositivo:</label>
+            <select name="dispositivo" class="form-select" required>
+                <?php while ($row = $dispositivos->fetch_assoc()): ?>
+                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['nombre']) ?></option>
+                <?php endwhile; ?>
+            </select>
         </div>
 
         <div class="mb-3">
-            <label for="estado" class="form-label">Estado:</label>
-            <select id="estado" name="estado" class="form-select">
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
+            <label class="form-label">Tipo:</label>
+            <select name="tipo" class="form-select" required>
+                <option value="error">Error</option>
+                <option value="aviso">Aviso</option>
+                <option value="mantenimiento">Mantenimiento</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Usuario asignado:</label>
+            <select name="usuario" class="form-select" required>
+                <?php while ($row = $usuarios->fetch_assoc()): ?>
+                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['nombre']) ?></option>
+                <?php endwhile; ?>
             </select>
         </div>
 
         <div class="botones-centrados">
-            <button type="submit" class="btn btn-success boton-accion">Guardar</button>
-            <a href="listar.php" class="btn btn-secondary boton-accion">Volver a la lista</a>
+            <button type="submit" class="btn btn-success boton-accion">Crear</button>
+            <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
         </div>
     </form>
-
 </div>
+
 <?php include '../includes/aside.php'; ?>
 </div>
+
 <?php include '../includes/footer.php'; ?>
+

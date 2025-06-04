@@ -137,10 +137,11 @@ include '../conexion.php';
                         <td><?= htmlspecialchars($row['responsable'] ?? '') ?></td>
                         <td>
                             <?php if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico'): ?>
-                                <div style="display: flex; gap: 10px; justify-content: center;">
-                                    <a href='editar.php?id=<?= $row['id'] ?>' class='btn btn-primary' style="font-weight: bold; margin: auto;">Editar</a>
-                                    <a href='listar.php?eliminar=<?= $row['id'] ?>' class='btn btn-danger' style="font-weight: bold;">Eliminar</a>
-                                </div>
+				<div class="d-flex justify-content-center gap-2">
+    <a href="editar.php?id=<?= $row['id'] ?>" class="btn btn-primary fw-bold">Editar</a>
+    <a href="eliminar.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar este dispositivo?');">Eliminar</a>
+</div>
+
                             <?php else: ?>
                                 <span class="text-muted">Sin permiso</span>
                             <?php endif; ?>
@@ -162,3 +163,12 @@ include '../conexion.php';
 </div>
 
 <?php include '../includes/footer.php'; ?>
+<script>
+document.querySelectorAll('.eliminar-enlace').forEach(function(enlace) {
+    enlace.addEventListener('click', function(event) {
+        if (!confirm('¿Estás seguro de que quieres eliminar este dispositivo?')) {
+            event.preventDefault(); // Solo se cancela si el usuario dice que NO
+        }
+    });
+});
+</script>

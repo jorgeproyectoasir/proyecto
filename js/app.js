@@ -1,3 +1,13 @@
+document.querySelector('form').addEventListener('submit', function(e) {
+    const ipInput = this.ip.value.trim();
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ipInput)) {
+        alert('Por favor, introduce una IP válida en formato xxx.xxx.xxx.xxx');
+        e.preventDefault();
+    }
+});
+
+
 // Confirmación antes de eliminar registros
 document.addEventListener("DOMContentLoaded", function () {
     const enlacesEliminar = document.querySelectorAll("a.eliminar");

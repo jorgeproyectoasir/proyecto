@@ -1,221 +1,86 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Plataforma IT</title>
-  <link rel="stylesheet" href="/css/estilo.css?v=1748854650">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="../js/app.js" defer></script>
-</head>
-<body>
+<?php
+include '../includes/header.php';
+include '../includes/aside.php';
+include '../conexion.php';
 
-<header>
-  <div class="header-container d-flex justify-content-between align-items-center px-4">
-    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
-    <div class="text-end fs-5">
-      <div><strong>Usuario:</strong> Jorge Admin</div>
-      <div><strong>Rol:</strong> admin</div>
-      <div><strong>Fecha:</strong> 02/06/2025 10:57</div>
+if (!isset($_GET['id'])) {
+    echo "<div class='alerta-error'>ID de dispositivo no especificado.</div>";
+    include '../includes/footer.php';
+    exit;
+}
+
+$id = intval($_GET['id']);
+
+// Procesar actualización si se ha enviado el formulario
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nombre = trim($_POST['nombre']);
+    $tipo = trim($_POST['tipo']);
+    $ip = trim($_POST['ip']);
+    $estado = $_POST['estado'];
+    $responsable = intval($_POST['responsable']);
+
+    $stmt = $conn->prepare("UPDATE dispositivos SET nombre=?, tipo=?, ip=?, estado=?, responsable=? WHERE id=?");
+    $stmt->bind_param("ssssii", $nombre, $tipo, $ip, $estado, $responsable, $id);
+    $stmt->execute();
+
+    echo "<div class='alerta-exito'>Dispositivo actualizado correctamente.</div>";
+    echo "<script>setTimeout(() => { window.location.href = 'listar.php'; }, 2000);</script>";
+    include '../includes/footer.php';
+    exit;
+}
+
+// Obtener datos actuales del dispositivo
+$stmt = $conn->prepare("SELECT * FROM dispositivos WHERE id = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$resultado = $stmt->get_result();
+
+if ($resultado->num_rows === 0) {
+    echo "<div class='alerta-error'>Dispositivo no encontrado.</div>";
+    include '../includes/footer.php';
+    exit;
+}
+
+$dispositivo = $resultado->fetch_assoc();
+?>
+
+<h2 class="titulos">Editar Dispositivo</h2>
+
+<form method="POST" class="formulario">
+    <div class="mb-3">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" class="form-control" required value="<?= htmlspecialchars($dispositivo['nombre']) ?>">
     </div>
-  </div>
-</header>
 
-<!-- === CONTENIDO PRINCIPAL === -->
-<div class="w-100 px-4 mt-4">
-
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: #B0D0FF;
-        font-family: Arial, sans-serif;
-    }
-
-    .titulos {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 2em;
-        color: #333;
-    }
-
-    .panel-container {
-        max-width: 700px;
-        margin: 30px auto;
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-        padding: 30px;
-    }
-
-    label {
-        font-weight: bold;
-        display: block;
-        margin-bottom: 6px;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 10px;
-        font-size: 1em;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-    }
-
-    .mb-3 {
-        margin-bottom: 20px;
-    }
-
-    .botones-centrados {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-    }
-
-    .boton-accion {
-        min-width: 160px;
-        font-weight: bold;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .btn-success {
-        background-color: #198754;
-        color: white;
-    }
-
-    .btn-secondary {
-        background-color: gray;
-        color: white;
-    }
-</style>
-
-<!-- ✅ FORMULARIO REGISTRO -->
-<div class="contenido-flex">
-<div class="panel-container">
-
-    <h2 class="titulos">Editar dispositivo</h2>
-
-    <form method="POST" action="procesar_registro.php">
-        <div class="mb-3">
-            <label>Nombre:</label>
-            <input type="text" name="nombre" class="form-control" required>
-        </div>
-
-	<div class="mb-3">
-            <label>IP:</label>
-            <input type="number" name="ip" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label>Tipo:</label>
-            <input type="text" name="tipo" class="form-control" required>
-        </div>
-	
-	
-        <div class="mb-3">
-		<label>Responsable:</label>
-		<select name="o" class="form-control" required>
-                <option value="Jorge Admin">Jorge Admin</option>
-                <option value="Luis Tecnico"> Luis Técnico</option>
-                <option value="Ana">Ana Usuaria</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label>Estado:</label>
-            <select name="estado" class="form-control" required>
-                <option value="activo">Activo</option>
-                <option value="inactivo">Inactivo</option>
-                <option value="mantenimiento">Mantenimiento</option>
-            </select>
-        </div>
-
-        <div class="botones-centrados">
-            <button type="submit" class="btn btn-success boton-accion">Actualizar</button>
-            <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
-        </div>
-    </form>
-
-</div>
-
-<!-- ASIDE -->
-<aside class="aside-estandar">
-    <h3>Acerca de Plataforma IT</h3>
-    <div class="botones-centrados" style="text-align: center;">
-        <p>Esta plataforma permite gestionar incidencias, tareas y dispositivos de manera eficiente.</p>
-        <p>Diseñada para facilitar el trabajo diario en entornos IT.</p>
+    <div class="mb-3">
+        <label for="tipo">Tipo:</label>
+        <input type="text" id="tipo" name="tipo" class="form-control" required value="<?= htmlspecialchars($dispositivo['tipo']) ?>">
     </div>
-    <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
 
-    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h3>
-    <ul style="font-size: 21px;">
-        <li>Automatización de procesos IT</li>
-        <li>Integración con múltiples sistemas</li>
-        <li>Interfaz intuitiva y fácil de usar</li>
-    </ul>
-</aside>
-</div>
+    <div class="mb-3">
+        <label for="ip">IP:</label>
+        <input type="text" id="ip" name="ip" class="form-control" required value="<?= htmlspecialchars($dispositivo['ip']) ?>">
+    </div>
 
-</div> <!-- Cierre del div principal abierto en header.php -->
+    <div class="mb-3">
+        <label for="estado">Estado:</label>
+        <select name="estado" id="estado" class="form-control" required>
+            <option value="activo" <?= $dispositivo['estado'] === 'activo' ? 'selected' : '' ?>>Activo</option>
+            <option value="inactivo" <?= $dispositivo['estado'] === 'inactivo' ? 'selected' : '' ?>>Inactivo</option>
+            <option value="mantenimiento" <?= $dispositivo['estado'] === 'mantenimiento' ? 'selected' : '' ?>>Mantenimiento</option>
+        </select>
+    </div>
 
-<footer class="mt-5 text-white py-4">
-  <div class="container text-center" style="margin-top: 10px;">
-    <p class="mb-2" style="font-size: 1.5rem;">&copy; 2025 Plataforma IT. Todos los derechos reservados.</p>
-    <p class="mb-0" style="font-size: 1.4rem;">Desarrollado por <strong>Jorge Juncá López</strong> | Proyecto ASIR</p>
-  </div>
-</footer>
+    <div class="mb-3">
+        <label for="responsable">Responsable (ID usuario):</label>
+        <input type="number" id="responsable" name="responsable" class="form-control" required value="<?= htmlspecialchars($dispositivo['responsable']) ?>">
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="botones-centrados">
+        <button type="submit" class="btn btn-success boton-accion">Guardar Cambios</button>
+        <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
+    </div>
+</form>
 
-<script>
-// Tiempo de inactividad antes de la expiración (en segundos)
-const tiempoLimite = 900; // 15 minutos
-const avisoAntes = 60;
+<?php include '../includes/footer.php'; ?>
 
-let contador = tiempoLimite;
-
-const alerta = document.createElement("div");
-alerta.textContent = "⚠️ Tu sesión está a punto de expirar por inactividad.";
-alerta.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #004085;
-    color: black;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    font-weight: bold;
-    display: none;
-    z-index: 9999;
-`;
-document.body.appendChild(alerta);
-
-const intervalo = setInterval(() => {
-    contador--;
-
-    if (contador === avisoAntes) {
-        alerta.style.display = 'block';
-    }
-
-    if (contador <= 0) {
-        clearInterval(intervalo);
-        window.location.href = '/proyecto/index.php?expirado=1';
-    }
-}, 1000);
-
-['mousemove', 'keydown', 'click', 'scroll'].forEach(evento => {
-    document.addEventListener(evento, () => {
-        contador = tiempoLimite;
-        alerta.style.display = 'none';
-    });
-});
-</script>
-
-</body>
-</html>

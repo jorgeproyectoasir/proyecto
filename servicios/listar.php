@@ -29,8 +29,6 @@ echo '<div class="panel-container">';
 if (isset($_GET['msg'])) {
     echo "<div class='alert alert-success mt-3'>" . htmlspecialchars($_GET['msg']) . "</div>";
 }
-
-// Eliminar servicio (solo admin)
 if (isset($_GET['eliminar']) && $_SESSION['rol'] === 'admin') {
     $id = intval($_GET['eliminar']);
     $stmt = $conexion->prepare("DELETE FROM servicios WHERE id = ?");
