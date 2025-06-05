@@ -59,34 +59,44 @@ $sql = "SELECT u.id, u.nombre, u.email, r.nombre AS rol_nombre
 $resultado = $conexion->query($sql);
 
 // Tabla de usuarios
+// Tabla de usuarios
 echo "<table class='table-accesos' style='margin-top: 30px;'>
 <tr>
     <th>ID</th>
     <th>Nombre</th>
     <th>Email</th>
-    <th>Rol</th>
-    <th>Acciones</th>
-</tr>";
+    <th>Rol</th>";
+
+if ($_SESSION['rol'] === 'admin') {
+    echo "<th>Acciones</th>";
+}
+
+echo "</tr>";
 
 while ($row = $resultado->fetch_assoc()) {
     echo "<tr>
         <td>" . $row['id'] . "</td>
         <td>" . htmlspecialchars($row['nombre']) . "</td>
         <td>" . htmlspecialchars($row['email']) . "</td>
-        <td>" . htmlspecialchars($row['rol_nombre'] ?? 'Sin rol') . "</td>
-        <td>";
+        <td>" . htmlspecialchars($row['rol_nombre'] ?? 'Sin rol') . "</td>";
 
-    // Editar con color azul
-    if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico') {
-        echo "<a href='asignar_roles.php?id={$row['id']}' class='btn  me-2' style='background-color: #0d6efd; color: white; font-weight: bold;'>Editar</a>";
+    if ($_SESSION['rol'] === 'admin') {
+        echo "<td>";
+
+        // Editar
+        echo "<a href='asignar_roles.php?id={$row['id']}' class='btn me-2' style='background-color: #0d6efd; color: white; font-weight: bold;'>Editar</a>";
+
+	        // Eliminar
+
+	        // Eliminar
+        if ($row['id'] !== $_SESSION['usuario_id']) {
+            echo "<a href='?eliminar={$row['id']}' class='btn btn-danger' style='font-weight: bold;' onclick='return confirm(\"¿Estás seguro de que deseas eliminar este usuario?\");'>Eliminar</a>";
+        }
+
+        echo "</td>";
     }
 
-    // Eliminar
-    if ($_SESSION['rol'] === 'admin' && $row['id'] !== $_SESSION['usuario_id']) {
-	echo "<a href='listar.php?eliminar={$row['id']}' class='btn btn-danger eliminar' style='font-weight: bold;'>Eliminar</a>";
-    }
-
-    echo "</td></tr>";
+    echo "</tr>";
 }
 
 echo "</table>";
@@ -95,10 +105,10 @@ echo "</table>";
 echo "<div style='text-align: center; margin-top: 20px;'>";
 
 if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico') {
-    echo "<a href='registro.php' class='btn btn-success me-2' style='min-width: 180px; font-weight: bold; font-size:1.2em;'>Agregar nuevo usuario</a>";
+    echo "<a href='registro.php' class='btn btn-success me-2' style='min-width: 180px; font-weight: bold; font-size:1.2em; margin-top: 10px;'>Agregar nuevo usuario</a>";
 }
 
-echo "<a href='../panel.php' class='btn btn-secondary' style='min-width: 180px; font-weight: bold; font-size:1.2em;'>Volver al panel</a>";
+echo "<a href='../panel.php' class='btn btn-secondary' style='min-width: 180px; font-weight: bold; font-size:1.2em; margin-top: 10px;'>Volver al panel</a>";
 echo "</div>";
 
 echo '</div>'; // panel-container
@@ -107,4 +117,15 @@ echo '</div>'; // contenido-flex
 include '../includes/footer.php';
 
 ?>
+
+<script>
+  const alertEl = document.querySelector('.alert-success');
+  if (alertEl) {
+    setTimeout(() => {
+      alertEl.style.transition = 'opacity 0.5s ease';
+      alertEl.style.opacity = '0';
+      setTimeout(() => alertEl.remove(), 500);
+    }, 1500);
+  }
+</script>
 

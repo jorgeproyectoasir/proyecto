@@ -156,7 +156,7 @@ $usuario = mysqli_fetch_assoc($resultado);
 
         <div class="botones-centrados">
             <button type="submit" class="btn btn-success boton-accion">Actualizar</button>
-            <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
+            <a href="../panel.php" class="btn btn-secondary boton-accion">Cancelar</a>
         </div>
     </form>
 

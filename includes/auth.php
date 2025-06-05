@@ -21,9 +21,11 @@ $tiempo_limite = 900; // 15 minutos
 if (isset($_SESSION['ultima_actividad']) && (time() - $_SESSION['ultima_actividad']) > $tiempo_limite) {
     session_unset();
     session_destroy();
-    header("Location: /proyecto/index.php?expirado=1");
+	$host = $_SERVER['HTTP_HOST'];
+header("Location: https://$host/index.php");
     exit();
 }
+
 
 $_SESSION['ultima_actividad'] = time();
 // -----------------------------

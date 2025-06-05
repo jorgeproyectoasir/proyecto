@@ -5,6 +5,7 @@
   <title>Plataforma IT</title>
   <link rel="stylesheet" href="/css/estilo.css?v=<?= time() ?>">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <?php
     $path_prefix = str_contains($_SERVER['PHP_SELF'], '/usuarios/') ||
                    str_contains($_SERVER['PHP_SELF'], '/dispositivos/') ||
@@ -30,7 +31,15 @@
 
 <header>
   <div class="header-container d-flex justify-content-between align-items-center px-4">
-    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
+<div class="d-flex align-items-center">
+  <a href="<?= $path_prefix ?>panel.php">
+    <img src="<?= $path_prefix ?>img/seguridad.png" alt="Logo" style="height: 70px; margin-right: 15px;">
+  </a>
+  <a href="<?= $path_prefix ?>panel.php" style="text-decoration: none; color: inherit;">
+    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4em; margin-top: -10px;">Plataforma IT</h1>
+  </a>
+</div>
+
 
     <?php if ($usuario_nombre && $usuario_rol): ?>
     <div class="text-end fs-5">

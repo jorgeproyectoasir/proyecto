@@ -60,7 +60,7 @@ include 'includes/header.php';
 
 <?php if (isset($_SESSION['flash'])): ?>
     <div class="alert alert-danger">
-        <?= $_SESSION['flash']['mensaje'] ?>
+       <?= $_SESSION['flash']['mensaje'] ?>
     </div>
     <?php unset($_SESSION['flash']); ?>
 <?php endif; ?>
@@ -68,6 +68,18 @@ include 'includes/header.php';
 <?php if (isset($_GET['expirado']) && $_GET['expirado'] == 1): ?>
     <div class="alert">⚠️ Tu sesión ha expirado por inactividad. Inicia sesión nuevamente.</div>
 <?php endif; ?>
+<script>
+  const toggleBtn = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+  const icon = document.getElementById('toggleIcon');
+
+  toggleBtn.addEventListener('click', () => {
+    const tipo = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = tipo;
+    icon.classList.toggle('bi-eye');
+    icon.classList.toggle('bi-eye-slash');
+  });
+</script>
 
 <div class="login-container">
     <div class="login-image">
@@ -81,25 +93,27 @@ include 'includes/header.php';
             <h2 class="login-subtitulo">Iniciar Sesión</h2>
         </div>
 
-        <form action="usuarios/login.php" method="POST" class="login-form">
-    <div>
-        <label for="email">Correo electrónico:</label>
-        <input type="email" name="email" id="email" class="form-control" required>
-    </div>
+<form action="usuarios/login.php" method="POST" class="login-form">
+  <div class="mb-3">
+    <label for="email" class="form-label">Correo electrónico:</label>
+    <input type="email" name="email" id="email" class="form-control" required>
+  </div>
 
-    <div>
-        <label for="password">Contraseña:</label>
-        <input type="password" name="password" id="password" class="form-control" required>
+  <div class="mb-3">
+    <label for="password" class="form-label">Contraseña:</label>
+    <div class="input-group">
+      <input type="password" name="password" id="password" class="form-control" required>
+      <button type="button" class="btn btn-secondary" id="togglePassword" tabindex="-1">
+        <i class="bi bi-eye" id="toggleIcon"></i>
+      </button>
     </div>
+  </div>
 
-    <!-- Contenedor para los botones -->
-<div class="botones-centrados">
-          <button type="button" id="togglePassword" class="btn btn-secondary boton-login">
-            <span id="toggleIcon" class="bi bi-eye"></span><span class="texto"> Mostrar</span>
-          </button>
-          <button type="submit" class="btn btn-primary boton-login">Iniciar sesión</button>
-        </div>
+  <div class="botones-centrados">
+    <button type="submit" class="btn btn-primary boton-login">Iniciar sesión</button>
+  </div>
 </form>
+
     </div>
 </div>
 

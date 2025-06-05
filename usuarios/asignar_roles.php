@@ -70,10 +70,15 @@ while ($r = $roles->fetch_assoc()) {
 ?>
 
 <h2 class="titulos">Asignar roles a usuarios</h2>
+<h3>En esta página se puede modificar el rol de los usuarios.</h3>
 <style>
   h2 {
     font-size: 3rem;
     font-weight: 900;
+    margin: 30px;
+  }
+  h3{
+    text-align: center;
   }
 </style>
 
@@ -105,7 +110,7 @@ while ($r = $roles->fetch_assoc()) {
 </table>
 
 <div style="text-align: center; margin-top: 20px;">
-    <a href="listar.php" class="btn btn-secondary mt-3" style="width: 100px; display: inline-flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold;">Volver</a>
+    <a href="listar.php" class="btn btn-secondary mt-3" style="width: 100px; display: inline-flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; margin-bottom: 30px;">Volver</a>
 </div>
 
 <?php include '../includes/footer.php'; ?>

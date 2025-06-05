@@ -1,5 +1,10 @@
 <?php
-require_once("../conexion.php");
+include '../includes/auth.php';
+include '../includes/header.php';
+include '../conexion.php';
+require_once '../includes/log.php';
+
+$error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre = trim($_POST['nombre']);
@@ -10,8 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($nombre && $email && $password && $rol_id) {
         $password_hashed = password_hash($password, PASSWORD_DEFAULT);
 
-        // Comprobamos si el email ya está registrado
-        $check_stmt = $conn->prepare("SELECT id FROM usuarios WHERE email = ?");
+        // Verificar si ya existe ese email
+        $check_stmt = $conexion->prepare("SELECT id FROM usuarios WHERE email = ?");
         $check_stmt->bind_param("s", $email);
         $check_stmt->execute();
         $check_stmt->store_result();
@@ -19,144 +24,95 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($check_stmt->num_rows > 0) {
             $error = "El correo ya está registrado.";
         } else {
-            $stmt = $conn->prepare("INSERT INTO usuarios (nombre, email, contraseña, rol_id) VALUES (?, ?, ?, ?)");
+            $stmt = $conexion->prepare("INSERT INTO usuarios (nombre, email, contraseña, rol_id) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("sssi", $nombre, $email, $password_hashed, $rol_id);
 
             if ($stmt->execute()) {
-                header("Location: ../usuarios/listar.php");
+                registrar_log($conexion, $_SESSION['usuario_id'], 'crear_usuario', "Registró al usuario $email");
+                header("Location: listar.php?msg=Usuario registrado correctamente");
                 exit();
             } else {
                 $error = "Error al registrar el usuario.";
             }
+            $stmt->close();
         }
 
         $check_stmt->close();
-        $stmt->close();
     } else {
         $error = "Por favor, completa todos los campos.";
     }
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Plataforma IT</title>
-  <link rel="stylesheet" href="/css/estilo.css?v=1748951008">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="../js/app.js" defer></script>
-</head>
-<body>
-
-<header>
-  <div class="header-container d-flex justify-content-between align-items-center px-4">
-    <h1 class="display-5 mb-0" style="font-weight: bold; font-size: 4.5em; margin-top: -10px;">Plataforma IT</h1>
-    <div class="text-end fs-5">
-      <div><strong>Usuario:</strong> Jorge Admin</div>
-      <div><strong>Rol:</strong> admin</div>
-      <div><strong>Fecha:</strong> 03/06/2025 13:43</div>
-    </div>
-  </div>
-</header>
-
-<div class="w-100 px-4 mt-4">
-<aside class="aside-estandar">
-    <h3>Acerca de Plataforma IT</h3>
-    <div class="botones-centrados" style="text-align: center;">
-        <p>Esta plataforma permite gestionar incidencias, tareas y dispositivos de manera eficiente.</p>
-        <p>Diseñada para facilitar el trabajo diario en entornos IT.</p>
-    </div>
-    <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
-    
-    <h3 style="margin-top: 20px; display:flex; justify-content: center;">Beneficios clave</h3>
-    <ul style="font-size: 21px;">
-        <li>Automatización de procesos IT</li>
-        <li>Integración con múltiples sistemas</li>
-        <li>Interfaz intuitiva y fácil de usar</li>
-    </ul>
-</aside>
-
-<div class="contenido">
-    <h1>Registrar nuevo usuario</h1>
-
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger text-center"><?= $error ?></div>
-    <?php endif; ?>
-
-    <form method="post" class="formulario-estandar">
-        <label for="nombre">Nombre:</label>
-        <input type="text" name="nombre" id="nombre" required>
-
-        <label for="email">Correo electrónico:</label>
-        <input type="email" name="email" id="email" required>
-
-        <label for="password">Contraseña:</label>
-        <input type="password" name="password" id="password" required>
-
-        <label for="rol_id">Rol:</label>
-        <select name="rol_id" id="rol_id" required>
-            <option value="">Selecciona un rol</option>
-            <option value="1">Admin</option>
-            <option value="2">Técnico</option>
-            <option value="3">Usuario</option>
-        </select>
-
-        <div class="botones-centrados">
-            <button type="submit" class="boton-accion">Registrar</button>
-        </div>
-    </form>
-</div>
-</div>
-
-<footer class="mt-5 text-white py-4">
-  <div class="container text-center" style="margin-top: 10px;">
-    <p class="mb-2" style="font-size: 1.5rem;">&copy; 2025 Plataforma IT. Todos los derechos reservados.</p>
-    <p class="mb-0" style="font-size: 1.4rem;">Desarrollado por <strong>Jorge Juncá López</strong> | Proyecto ASIR</p>
-  </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-// Lógica de inactividad
-const tiempoLimite = 900;
-const avisoAntes = 60;
-let contador = tiempoLimite;
-
-const alerta = document.createElement("div");
-alerta.textContent = "⚠️ Tu sesión está a punto de expirar por inactividad.";
-alerta.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #004085;
-    color: black;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    font-weight: bold;
-    display: none;
-    z-index: 9999;
-`;
-document.body.appendChild(alerta);
-
-const intervalo = setInterval(() => {
-    contador--;
-    if (contador === avisoAntes) alerta.style.display = 'block';
-    if (contador <= 0) {
-        clearInterval(intervalo);
-        window.location.href = '/proyecto/index.php?expirado=1';
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF; /* Fondo azul claro global */
     }
-}, 1000);
+    .form-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+</style>
 
-['mousemove', 'keydown', 'click', 'scroll'].forEach(evento => {
-    document.addEventListener(evento, () => {
-        contador = tiempoLimite;
-        alerta.style.display = 'none';
-    });
-});
-</script>
+<div class="contenido-flex">
+    <div class="panel-container">
 
-</body>
-</html>
+        <h2 class="titulos">Registrar nuevo usuario</h2>
+
+        <?php if (!empty($error)) : ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+
+        <form method="POST" class="form-container">
+            <div class="mb-3">
+                <label class="form-label">Nombre:</label>
+                <input type="text" name="nombre" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Correo electrónico:</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Contraseña:</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Rol:</label>
+                <select name="rol_id" class="form-select" required>
+                    <option value="">Selecciona un rol</option>
+                    <?php
+                    $roles = $conexion->query("SELECT id, nombre FROM roles");
+                    while ($rol = $roles->fetch_assoc()) {
+                        echo "<option value='{$rol['id']}'>" . htmlspecialchars($rol['nombre']) . "</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-success px-4">Registrar</button>
+                <a href="listar.php" class="btn btn-secondary px-4">Volver a listar</a>
+            </div>
+        </form>
+    </div>
+
+    <?php include_once '../includes/aside.php'; ?>
+</div>
+
+<?php include '../includes/footer.php'; ?>
+

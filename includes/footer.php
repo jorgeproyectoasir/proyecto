@@ -1,9 +1,14 @@
 </div> <!-- Cierre del div principal abierto en header.php -->
 
-<footer class="mt-5 text-white py-4">
-  <div class="container text-center" style="margin-top: 10px;">
-    <p class="mb-2" style="font-size: 1.5rem;">&copy; <?= date('Y') ?> Plataforma IT. Todos los derechos reservados.</p>
-    <p class="mb-0" style="font-size: 1.4rem;">Desarrollado por <strong>Jorge Juncá López</strong> | Proyecto ASIR</p>
+<footer class="text-white py-4" style="background-color: #004085; font-size: 1.3rem;">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap text-center">
+    <div>
+      &copy; <?= date('Y') ?> Plataforma IT. Desarrollado por <strong>Jorge Juncá López</strong> — Proyecto ASIR
+    </div>
+    <div>
+      <a href="<?= $path_prefix ?>cookies.php" class="text-white text-decoration-underline me-4">Política de Cookies</a>
+      <a href="<?= $path_prefix ?>privacidad.php" class="text-white text-decoration-underline">Política de Privacidad</a>
+    </div>
   </div>
 </footer>
 

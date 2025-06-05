@@ -5,6 +5,7 @@ include '../includes/auth.php';
 include '../includes/header.php';
 require_once '../includes/log.php';
 include '../conexion.php';
+
 echo "<style>
     html, body {
         margin: 0;
@@ -45,21 +46,14 @@ if ($resultado->num_rows === 0) {
 
 $incidencia = $resultado->fetch_assoc();
 
-$puede_ver = false;
-if (
-    $rol === 'admin' ||
-    ($rol === 'tecnico' && $incidencia['tecnico_id'] == $usuario_id) ||
-    ($rol === 'usuario' && $incidencia['usuario_id'] == $usuario_id)
-) {
-    $puede_ver = true;
-}
-
-if (!$puede_ver) {
-    echo "<p class='alert alert-danger'>No tienes permisos para acceder a esta incidencia.</p>";
+// Cualquier usuario autenticado puede ver la incidencia
+if (!isset($_SESSION['usuario_id'])) {
+    echo "<p class='alert alert-danger'>Debes iniciar sesión para ver esta página.</p>";
     include '../includes/footer.php';
     exit();
 }
 
+// Procesar nuevo comentario
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mensaje'])) {
     $mensaje = trim($_POST['mensaje']);
     if (!empty($mensaje)) {
@@ -72,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['mensaje'])) {
     }
 }
 
+// Obtener comentarios
 $stmt = $conexion->prepare("SELECT c.*, u.nombre FROM comentarios_incidencias c JOIN usuarios u ON c.usuario_id = u.id WHERE c.incidencia_id = ? ORDER BY c.fecha DESC");
 $stmt->bind_param("i", $incidencia_id);
 $stmt->execute();
@@ -114,7 +109,7 @@ small.text-muted {
     <div class="alert alert-success">Comentario añadido correctamente.</div>
 <?php endif; ?>
 
-<h4 class="botones-centrados"  style="font-size: 1.8rem;">Agregar un comentario</h4>
+<h4 class="botones-centrados" style="font-size: 1.8rem;">Agregar un comentario</h4>
 <form method="POST" class="border p-3 mb-3 bg-light rounded">
     <div class="mb-3">
         <textarea name="mensaje" class="form-control" rows="4" required></textarea>
@@ -126,11 +121,11 @@ small.text-muted {
 
 <hr>
 
-<h4 class="botones-centrados"  style="font-size: 1.8rem;">Historial de comentarios</h4>
+<h4 class="botones-centrados" style="font-size: 1.8rem;">Historial de comentarios</h4>
 <?php if ($comentarios->num_rows > 0): ?>
     <?php while ($c = $comentarios->fetch_assoc()): ?>
         <div class="border p-2 mb-2">
-            <p><strong><?= htmlspecialchars($c['nombre']) ?>:</strong> <?= nl2br(htmlspecialchars($c['mensaje'])) ?></p>
+	    <p><strong><?= htmlspecialchars($c['nombre']) ?>:</strong> <?= nl2br(htmlspecialchars($c['mensaje'])) ?></p>
             <small class="text-muted"><?= htmlspecialchars($c['fecha']) ?></small>
         </div>
     <?php endwhile; ?>
