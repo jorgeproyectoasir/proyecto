@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario_id = intval($_POST["usuario"]);
 
     if (!empty($descripcion) && !empty($estado) && !empty($tipo)) {
-	$stmt = $conexion->prepare("INSERT INTO incidencias (descripcion, estado, dispositivo_id, tipo, usuario_id, fecha) VALUES (?, ?, ?, ?, ?, NOW())");
+        $stmt = $conexion->prepare("INSERT INTO incidencias (descripcion, estado, dispositivo_id, tipo, usuario_id, fecha) VALUES (?, ?, ?, ?, ?, NOW())");
         $stmt->bind_param("ssisi", $descripcion, $estado, $dispositivo_id, $tipo, $usuario_id);
 
         if ($stmt->execute()) {
@@ -40,6 +40,111 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link rel="stylesheet" href="/css/estilo.css?v=1748854650">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="../js/app.js" defer></script>
+  <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF;
+    }
+
+    .contenido-flex {
+        display: flex;
+        align-items: flex-start;
+        gap: 30px;
+        padding: 20px;
+        flex-wrap: wrap;
+    }
+
+    .panel-container {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .aside-estandar {
+        width: 300px;
+        max-width: 100%;
+        flex-shrink: 0;
+        background-color: #f9f9f9;
+        padding: 20px;
+        font-size: 25px;
+        border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .titulos {
+        text-align: center;
+        font-size: 3.5em;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+
+    .formulario {
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .form-label {
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+    .form-control, .form-select, textarea {
+        font-size: 1.1em;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        width: 100%;
+        resize: vertical;
+    }
+
+    .mb-3 {
+        margin-bottom: 20px;
+    }
+
+    .botones-centrados {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .boton-accion {
+        min-width: 180px;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+  </style>
 </head>
 <body>
 
@@ -55,72 +160,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </header>
 
 <div class="w-100 px-4 mt-4">
-<div class="contenido-flex">
-<div class="panel-container">
-    <h2 class="titulos">Crear nueva incidencia</h2>
+  <div class="contenido-flex">
+    <div class="panel-container">
+      <h2 class="titulos">Crear nueva incidencia</h2>
 
-    <?= $mensaje ?>
+      <?= $mensaje ?>
 
-    <form method="POST" action="">
+      <form method="POST" action="" class="formulario">
         <div class="mb-3">
-            <label>Descripción:</label>
-            <input type="text" name="descripcion" class="form-control" required>
+          <label class="form-label">Descripción:</label>
+          <input type="text" name="descripcion" class="form-control" required>
         </div>
 
         <div class="mb-3">
-            <label>Estado:</label>
-            <select name="estado" class="form-control" required>
-                <option value="abierta">Abierta</option>
-                <option value="cerrada">Cerrada</option>
-            </select>
+          <label class="form-label">Estado:</label>
+          <select name="estado" class="form-select" required>
+            <option value="abierta">Abierta</option>
+            <option value="cerrada">Cerrada</option>
+          </select>
         </div>
 
         <div class="mb-3">
-            <label>Dispositivo:</label>
-            <select name="dispositivo" class="form-control" required>
-                <?php while($d = $dispositivos->fetch_assoc()): ?>
-                    <option value="<?= $d['id'] ?>"><?= htmlspecialchars($d['nombre']) ?></option>
-                <?php endwhile; ?>
-            </select>
+          <label class="form-label">Dispositivo:</label>
+          <select name="dispositivo" class="form-select" required>
+            <?php while($d = $dispositivos->fetch_assoc()): ?>
+              <option value="<?= $d['id'] ?>"><?= htmlspecialchars($d['nombre']) ?></option>
+            <?php endwhile; ?>
+          </select>
         </div>
 
         <div class="mb-3">
-            <label>Tipo:</label>
-            <select name="tipo" class="form-control" required>
-                <option value="error">Error</option>
-                <option value="aviso">Aviso</option>
-                <option value="mantenimiento">Mantenimiento</option>
-            </select>
+          <label class="form-label">Tipo:</label>
+          <select name="tipo" class="form-select" required>
+            <option value="error">Error</option>
+            <option value="aviso">Aviso</option>
+            <option value="mantenimiento">Mantenimiento</option>
+          </select>
         </div>
 
         <div class="mb-3">
-            <label>Usuario:</label>
-            <select name="usuario" class="form-control" required>
-                <?php while($u = $usuarios->fetch_assoc()): ?>
-                    <option value="<?= $u['id'] ?>"><?= htmlspecialchars($u['nombre']) ?></option>
-                <?php endwhile; ?>
-            </select>
+          <label class="form-label">Usuario:</label>
+          <select name="usuario" class="form-select" required>
+            <?php while($u = $usuarios->fetch_assoc()): ?>
+              <option value="<?= $u['id'] ?>"><?= htmlspecialchars($u['nombre']) ?></option>
+            <?php endwhile; ?>
+          </select>
         </div>
 
         <div class="botones-centrados">
-            <button type="submit" class="btn btn-success boton-accion">Crear</button>
-            <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
+          <button type="submit" class="btn btn-success boton-accion">Crear</button>
+          <a href="listar.php" class="btn btn-secondary boton-accion">Cancelar</a>
         </div>
-    </form>
-</div>
+      </form>
+    </div>
 
-<aside class="aside-estandar">
-    <h3>Acerca de Plataforma IT</h3>
-    <p>Esta plataforma permite gestionar incidencias, tareas y dispositivos de manera eficiente.</p>
-    <img src="/img/aside.jpg" alt="Nuestra Plataforma" class="img-fluid">
-    <h3>Beneficios clave</h3>
-    <ul>
-        <li>Automatización de procesos IT</li>
-        <li>Integración con múltiples sistemas</li>
-        <li>Interfaz intuitiva y fácil de usar</li>
-    </ul>
-</aside>
-</div>
+    <?php include_once __DIR__ . '/../includes/aside.php'; ?>
+  </div>
 </div>
 
 <footer class="mt-5 text-white py-4">

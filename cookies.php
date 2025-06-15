@@ -1,5 +1,4 @@
 <?php include 'includes/header.php'; ?>
-<?php include 'includes/aside.php'; ?>
 <h2 class="mt-4 mb-3">Política de Cookies</h2>
 <p>Este sitio web utiliza cookies para mejorar la experiencia del usuario. Al continuar navegando, aceptas el uso de cookies.</p>
 <p>Las cookies se utilizan para:</p>

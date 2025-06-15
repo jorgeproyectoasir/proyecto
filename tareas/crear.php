@@ -56,71 +56,132 @@ if (!$tecnicos) {
 <?php include '../includes/header.php'; ?>
 
 <style>
-/* Tus estilos aquí */
+ html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF; /* Fondo azul claro global */
+    }
+/* Contenedor principal para formularios y paneles */
 .panel-container {
     max-width: 700px;
     margin: 30px auto;
     background: #ffffff;
     border-radius: 12px;
     box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    padding: 30px;
+    padding: 30px 40px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-.form-label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 6px;
-}
-.form-control, .form-select {
-    width: 100%;
-    padding: 10px;
-    font-size: 1em;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-}
-.alert {
-    margin: 10px auto;
-    width: fit-content;
-    padding: 10px 20px;
-    background-color: #ffe6e6;
-    color: #b30000;
-    border-radius: 6px;
+
+/* Títulos de formularios */
+.titulos {
+    font-weight: 700;
+    font-size: 2em;
+    margin-bottom: 25px;
+    color: #333;
     text-align: center;
 }
+
+/* Etiquetas para inputs */
+.form-label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+    color: #444;
+    user-select: none;
+}
+
+/* Inputs, selects y textareas */
+.form-control, .form-select, textarea {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1em;
+    border: 1.8px solid #ccc;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+    outline-offset: 2px;
+    outline-color: transparent;
+}
+
+.form-control:focus, .form-select:focus, textarea:focus {
+    border-color: #198754;
+    outline-color: #198754;
+    box-shadow: 0 0 5px rgba(25, 135, 84, 0.5);
+}
+
+/* Textarea específico */
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Contenedor para mensajes de error o alerta */
+.alert {
+    margin: 15px auto;
+    padding: 12px 25px;
+    width: fit-content;
+    background-color: #ffe6e6;
+    color: #b30000;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    user-select: none;
+}
+
+/* Contenedor flexible para botones */
 .botones-centrados {
     display: flex;
     justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
-    margin-top: 20px;
+    margin-top: 30px;
 }
+
+/* Botones base */
 .boton-accion {
     min-width: 160px;
-    font-weight: bold;
-    padding: 10px 20px;
+    font-weight: 700;
+    padding: 12px 25px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+    text-decoration: none; /* Para enlaces tipo botón */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
+
+/* Botón verde */
 .btn-success {
     background-color: #198754;
     color: white;
 }
+
+.btn-success:hover, .btn-success:focus {
+    background-color: #146c43;
+}
+
+/* Botón gris */
 .btn-secondary {
-    background-color: gray;
+    background-color: #6c757d;
     color: white;
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+    background-color: #5a6268;
 }
 </style>
 
 <div class="contenido-flex">
 <div class="panel-container">
-    <h2 class="titulos text-center">Crear nueva tarea</h2>
+    <h2 class="titulos">Crear nueva tarea</h2>
 
     <?php if (!empty($mensaje)): ?>
         <div class="alert"><?= htmlspecialchars($mensaje) ?></div>
     <?php endif; ?>
 
-    <form method="POST">
+    <form method="POST" novalidate>
         <div class="mb-3">
             <label class="form-label" for="titulo">Título:</label>
             <input type="text" name="titulo" id="titulo" class="form-control" required value="<?= isset($_POST['titulo']) ? htmlspecialchars($_POST['titulo']) : '' ?>">
@@ -167,3 +228,4 @@ if (!$tecnicos) {
 </div>
 
 <?php include '../includes/footer.php'; ?>
+

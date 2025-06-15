@@ -4,8 +4,11 @@ error_reporting(E_ALL);
 
 include '../includes/auth.php';
 include '../includes/header.php';
+require_once '../includes/log.php';
+include '../conexion.php';
+?>
 
-echo "<style>
+<style>
     html, body {
         margin: 0;
         padding: 0;
@@ -87,15 +90,26 @@ echo "<style>
         min-width: 180px;
         font-weight: bold;
     }
-</style>";
+</style>
 
+<?php
+// Flash message
 if (isset($_SESSION['flash'])) {
     echo "<div class='alert alert-{$_SESSION['flash']['tipo']} text-center'>{$_SESSION['flash']['mensaje']}</div>";
     unset($_SESSION['flash']);
 }
 
-require_once '../includes/log.php';
-include '../conexion.php';
+// Éxito mensaje
+if (!empty($_SESSION['mensaje_exito'])) {
+    echo "<div class='alert alert-success' id='mensaje-exito'>{$_SESSION['mensaje_exito']}</div>";
+    echo "<script>
+        setTimeout(() => {
+            const msg = document.getElementById('mensaje-exito');
+            if (msg) msg.remove();
+        }, 2000);
+    </script>";
+    unset($_SESSION['mensaje_exito']);
+}
 ?>
 
 <div class="contenido-flex">
@@ -137,11 +151,10 @@ include '../conexion.php';
                         <td><?= htmlspecialchars($row['responsable'] ?? '') ?></td>
                         <td>
                             <?php if ($_SESSION['rol'] === 'admin' || $_SESSION['rol'] === 'tecnico'): ?>
-				<div class="d-flex justify-content-center gap-2">
-    <a href="editar.php?id=<?= $row['id'] ?>" class="btn btn-primary fw-bold">Editar</a>
-    <a href="eliminar.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar este dispositivo?');">Eliminar</a>
-</div>
-
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="editar.php?id=<?= $row['id'] ?>" class="btn btn-primary fw-bold">Editar</a>
+                                    <a href="eliminar.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar este dispositivo?');">Eliminar</a>
+                                </div>
                             <?php else: ?>
                                 <span class="text-muted">Sin permiso</span>
                             <?php endif; ?>
@@ -163,12 +176,14 @@ include '../conexion.php';
 </div>
 
 <?php include '../includes/footer.php'; ?>
+
 <script>
 document.querySelectorAll('.eliminar-enlace').forEach(function(enlace) {
     enlace.addEventListener('click', function(event) {
         if (!confirm('¿Estás seguro de que quieres eliminar este dispositivo?')) {
-            event.preventDefault(); // Solo se cancela si el usuario dice que NO
+            event.preventDefault();
         }
     });
 });
 </script>
+

@@ -6,36 +6,42 @@ require_once '../includes/log.php';
 $mensaje = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $nombre = trim($_POST['nombre']);
+    $tipo = trim($_POST['tipo']);
+    $estado = $_POST['estado'] ?? 'activo';
+    $dispositivo_id = $_POST['dispositivo'] ?: null;
     $descripcion = trim($_POST['descripcion']);
-    $estado = $_POST['estado'] ?? 'abierta';
-    $dispositivo_id = $_POST['dispositivo'];
-    $tipo = $_POST['tipo'];
-    $usuario_id = $_POST['usuario'];
 
-    if (empty($descripcion)) {
-        $mensaje = "❌ La descripción es obligatoria.";
+    if (empty($nombre)) {
+        $mensaje = "❌ El nombre del servicio es obligatorio.";
     } else {
         $stmt = $conexion->prepare(
-            "INSERT INTO incidencias (descripcion, estado, dispositivo_id, tipo, usuario_id) VALUES (?, ?, ?, ?, ?)"
+            "INSERT INTO servicios (nombre, tipo, estado, dispositivo_id, descripcion) VALUES (?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param("ssisi", $descripcion, $estado, $dispositivo_id, $tipo, $usuario_id);
+        // dispositivo_id puede ser null, usamos bind_param con tipos correspondientes
+        $stmt->bind_param("sssis", $nombre, $tipo, $estado, $dispositivo_id, $descripcion);
         $stmt->execute();
 
-        registrar_log($conexion, $_SESSION["usuario_id"], "Creó una nueva incidencia: $descripcion");
-        header("Location: listar.php?msg=Incidencia creada correctamente.");
+        registrar_log($conexion, $_SESSION["usuario_id"], "Creó un nuevo servicio: $nombre");
+        header("Location: listar.php?msg=Servicio creado correctamente.");
         exit();
     }
 }
 
-// Obtener lista de dispositivos y usuarios para los select
-$dispositivos = $conexion->query("SELECT id, nombre FROM dispositivos");
-$usuarios = $conexion->query("SELECT id, nombre FROM usuarios");
+// Obtener dispositivos para el select
+$dispositivos = $conexion->query("SELECT id, nombre FROM dispositivos ORDER BY nombre");
 ?>
 
 <?php include '../includes/header.php'; ?>
 
 <style>
-    .panel-container {
+    	html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #B0D0FF;
+    }
+
+	.panel-container {
         max-width: 700px;
         margin: 30px auto;
         background: #ffffff;
@@ -50,7 +56,7 @@ $usuarios = $conexion->query("SELECT id, nombre FROM usuarios");
         margin-bottom: 6px;
     }
 
-    .form-control, .form-select {
+    .form-control, .form-select, textarea {
         width: 100%;
         padding: 10px;
         font-size: 1em;
@@ -59,14 +65,19 @@ $usuarios = $conexion->query("SELECT id, nombre FROM usuarios");
         border-radius: 6px;
     }
 
+    textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
     .alert {
-        margin: 10px auto;
-        width: fit-content;
-        padding: 10px 20px;
-        background-color: #ffe6e6;
-        color: #b30000;
-        border-radius: 6px;
-        text-align: center;
+       margin: 10px auto;
+       width: fit-content;
+       padding: 10px 20px;
+       background-color: #ffe6e6;
+       color: #b30000;
+       border-radius: 6px;
+       text-align: center;
     }
 
     .botones-centrados {
@@ -99,7 +110,7 @@ $usuarios = $conexion->query("SELECT id, nombre FROM usuarios");
 
 <div class="contenido-flex">
 <div class="panel-container">
-    <h2 class="titulos text-center">Crear nueva incidencia</h2>
+    <h2 class="titulos text-center">Crear nuevo servicio</h2>
 
     <?php if (!empty($mensaje)): ?>
         <div class="alert"><?= htmlspecialchars($mensaje) ?></div>
@@ -107,21 +118,28 @@ $usuarios = $conexion->query("SELECT id, nombre FROM usuarios");
 
     <form method="POST">
         <div class="mb-3">
-            <label class="form-label">Descripción:</label>
-            <input type="text" name="descripcion" class="form-control" required>
+            <label class="form-label" for="nombre">Nombre:</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" required maxlength="100">
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Estado:</label>
-            <select name="estado" class="form-select" required>
-                <option value="abierta">Abierta</option>
-                <option value="cerrada">Cerrada</option>
+            <label class="form-label" for="tipo">Tipo:</label>
+            <input type="text" name="tipo" id="tipo" class="form-control" maxlength="50" placeholder="Opcional">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="estado">Estado:</label>
+            <select name="estado" id="estado" class="form-select" required>
+                <option value="activo" selected>Activo</option>
+                <option value="inactivo">Inactivo</option>
+                <option value="error">Error</option>
             </select>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Dispositivo:</label>
-            <select name="dispositivo" class="form-select" required>
+            <label class="form-label" for="dispositivo">Dispositivo asociado:</label>
+            <select name="dispositivo" id="dispositivo" class="form-select">
+                <option value="">-- Ninguno --</option>
                 <?php while ($row = $dispositivos->fetch_assoc()): ?>
                     <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['nombre']) ?></option>
                 <?php endwhile; ?>
@@ -129,21 +147,8 @@ $usuarios = $conexion->query("SELECT id, nombre FROM usuarios");
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Tipo:</label>
-            <select name="tipo" class="form-select" required>
-                <option value="error">Error</option>
-                <option value="aviso">Aviso</option>
-                <option value="mantenimiento">Mantenimiento</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Usuario asignado:</label>
-            <select name="usuario" class="form-select" required>
-                <?php while ($row = $usuarios->fetch_assoc()): ?>
-                    <option value="<?= $row['id'] ?>"><?= htmlspecialchars($row['nombre']) ?></option>
-                <?php endwhile; ?>
-            </select>
+            <label class="form-label" for="descripcion">Descripción:</label>
+            <textarea name="descripcion" id="descripcion" class="form-control" placeholder="Opcional"></textarea>
         </div>
 
         <div class="botones-centrados">

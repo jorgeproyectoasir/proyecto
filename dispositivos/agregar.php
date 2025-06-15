@@ -1,107 +1,185 @@
 <?php
-session_start();
-
-require_once '../conexion.php';
-require_once '../includes/auth.php';
-
-$mensaje = "";
-$clase_alerta = "";
-
-$nombre = $ip = $estado = $tipo = "";
-$responsable = null;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = trim($_POST['nombre'] ?? '');
-    $ip = trim($_POST['ip'] ?? '');
-    $estado = trim($_POST['estado'] ?? 'activo'); // valor por defecto
-    $tipo = trim($_POST['tipo'] ?? '');
-    $responsable = !empty($_POST['responsable']) ? intval($_POST['responsable']) : null;
-
-    if ($nombre === '') {
-        $mensaje = "El nombre es obligatorio.";
-        $clase_alerta = "alert alert-danger";
-    } else {
-        $sql = "INSERT INTO dispositivos (nombre, ip, estado, responsable, tipo) VALUES (?, ?, ?, ?, ?)";
-        if ($stmt = $conexion->prepare($sql)) {
-            // Como responsable puede ser NULL, bind_param no acepta directamente null,
-            // usamos un truco pasando NULL o valor
-            if ($responsable === null) {
-                $stmt->bind_param('sssis', $nombre, $ip, $estado, $nullVar, $tipo);
-                $nullVar = null;
-            } else {
-                $stmt->bind_param('sssis', $nombre, $ip, $estado, $responsable, $tipo);
-            }
-            if ($stmt->execute()) {
-                $mensaje = "Dispositivo agregado correctamente.";
-                $clase_alerta = "alert alert-success";
-                $nombre = $ip = $estado = $tipo = "";
-                $responsable = null;
-            } else {
-                $mensaje = "Error al agregar el dispositivo: " . htmlspecialchars($stmt->error);
-                $clase_alerta = "alert alert-danger";
-            }
-            $stmt->close();
-        } else {
-            $mensaje = "Error en la consulta: " . htmlspecialchars($conexion->error);
-            $clase_alerta = "alert alert-danger";
-        }
-    }
-}
-
-?>
-
-<?php include_once '../includes/header.php'; ?>
-<?php include_once '../includes/aside.php'; ?>
-<style>
- html, body {
+include '../includes/auth.php';
+include '../includes/header.php';
+echo "<style>
+    html, body {
         margin: 0;
         padding: 0;
         background-color: #B0D0FF;
     }
-</style>
-<div class="container mt-4">
-    <h2>Agregar nuevo dispositivo</h2>
 
-    <?php if ($mensaje): ?>
-        <div class="<?= $clase_alerta ?>" role="alert">
-            <?= $mensaje ?>
-        </div>
-    <?php endif; ?>
+    .contenido-flex {
+        display: flex;
+        align-items: flex-start;
+        gap: 30px;
+        padding: 20px;
+        flex-wrap: wrap;
+    }
 
-    <form method="post" action="">
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre *</label>
-            <input type="text" name="nombre" id="nombre" class="form-control" required value="<?= htmlspecialchars($nombre) ?>">
-        </div>
+    .panel-container {
+        flex: 1;
+        min-width: 300px;
+    }
 
-        <div class="mb-3">
-            <label for="ip" class="form-label">IP</label>
-            <input type="text" name="ip" id="ip" class="form-control" value="<?= htmlspecialchars($ip) ?>">
-        </div>
+    .aside-estandar {
+        width: 300px;
+        max-width: 100%;
+        flex-shrink: 0;
+        background-color: #f9f9f9;
+        padding: 20px;
+        font-size: 25px;
+        border-radius: 20px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
 
-        <div class="mb-3">
-            <label for="estado" class="form-label">Estado</label>
-            <select name="estado" id="estado" class="form-select">
-                <option value="activo" <?= $estado === 'activo' ? 'selected' : '' ?>>Activo</option>
-                <option value="inactivo" <?= $estado === 'inactivo' ? 'selected' : '' ?>>Inactivo</option>
-                <option value="mantenimiento" <?= $estado === 'mantenimiento' ? 'selected' : '' ?>>Mantenimiento</option>
-            </select>
-        </div>
+    .titulos {
+        text-align: center;
+        font-size: 3.5em;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
 
-        <div class="mb-3">
-            <label for="responsable" class="form-label">Responsable (ID usuario)</label>
-            <input type="number" name="responsable" id="responsable" class="form-control" value="<?= htmlspecialchars($responsable) ?>">
-        </div>
+    .formulario {
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 0 auto;
+    }
 
-        <div class="mb-3">
-            <label for="tipo" class="form-label">Tipo</label>
-            <input type="text" name="tipo" id="tipo" class="form-control" value="<?= htmlspecialchars($tipo) ?>">
-        </div>
+    .form-label {
+        font-weight: bold;
+        font-size: 1.2em;
+    }
 
-        <button type="submit" class="btn btn-primary">Agregar dispositivo</button>
-        <a href="listar.php" class="btn btn-secondary ms-2">Volver a la lista</a>
-    </form>
+    .form-control, .form-select {
+        font-size: 1.1em;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+
+    .mb-3 {
+        margin-bottom: 20px;
+    }
+
+    .botones-centrados {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .boton-accion {
+        min-width: 180px;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .alert {
+        margin: 10px auto;
+        width: fit-content;
+        padding: 10px 20px;
+        background-color: #ffe6e6;
+        color: #b30000;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+</style>";
+
+require_once '../includes/log.php';
+include '../conexion.php';
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $nombre = trim($_POST['nombre']);
+    $ip = trim($_POST['ip']);
+    $tipo = trim($_POST['tipo']);
+    $estado = trim($_POST['estado']);
+    $responsable = intval($_POST['responsable']);
+
+    $stmt = $conexion->prepare("INSERT INTO dispositivos (nombre, ip, tipo, estado, responsable) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssi", $nombre, $ip, $tipo, $estado, $responsable);
+    $stmt->execute();
+
+    $_SESSION['mensaje_exito'] = "Dispositivo agregado correctamente.";
+    header("Location: listar.php");
+    exit;
+}
+
+$resultadoUsuarios = $conexion->query("SELECT id, nombre FROM usuarios ORDER BY nombre ASC");
+?>
+
+<div class="contenido-flex">
+    <div class="panel-container">
+        <h2 class="titulos">Agregar nuevo dispositivo</h2>
+
+        <?php if (!empty($_SESSION['mensaje_error'])): ?>
+            <div class="alert alert-danger"><?= $_SESSION['mensaje_error'] ?></div>
+            <?php unset($_SESSION['mensaje_error']); ?>
+        <?php endif; ?>
+
+        <form action="agregar.php" method="POST" class="formulario" style="font-size: 1.2em;">
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre:</label>
+                <input type="text" name="nombre" id="nombre" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="ip" class="form-label">IP:</label>
+                <input type="text" name="ip" id="ip" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="tipo" class="form-label">Tipo:</label>
+                <select name="tipo" id="tipo" class="form-select" required>
+                    <option value="">-- Selecciona --</option>
+                    <option value="Router">Router</option>
+                    <option value="Switch">Switch</option>
+                    <option value="Servidor">Servidor</option>
+                    <option value="PC">PC</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="estado" class="form-label">Estado:</label>
+                <select name="estado" id="estado" class="form-select" required>
+                    <option value="">-- Selecciona --</option>
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                    <option value="En mantenimiento">En mantenimiento</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="responsable" class="form-label">Responsable:</label>
+                <select name="responsable" id="responsable" class="form-select">
+                    <option value="">-- Sin asignar --</option>
+                    <?php while ($usuario = $resultadoUsuarios->fetch_assoc()): ?>
+                        <option value="<?= $usuario['id'] ?>"><?= htmlspecialchars($usuario['nombre']) ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
+            <div class="botones-centrados">
+                <button type="submit" class="btn btn-success boton-accion">Guardar</button>
+                <a href="listar.php" class="btn btn-secondary boton-accion">Volver al listado</a>
+            </div>
+        </form>
+    </div>
+
+    <?php include_once __DIR__ . '/../includes/aside.php'; ?>
 </div>
 
-<?php include_once '../includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>
 
